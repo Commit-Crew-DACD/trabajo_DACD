@@ -1,7 +1,7 @@
 package org.ulpgc.dacd;
 
 import org.ulpgc.dacd.control.FlightService;
-import org.ulpgc.dacd.storage.FlightDatabaseManager;
+import org.ulpgc.dacd.control.storage.FlightDatabaseManager;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +16,6 @@ public class Main {
 
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                // Capturamos solo salidas ('S') desde Las Palmas (LPA)
                 db.saveFlights(service.getFlights("LPA", "S"));
                 System.out.println("Datos de vuelos actualizados en SQLite.");
             } catch (Exception e) {

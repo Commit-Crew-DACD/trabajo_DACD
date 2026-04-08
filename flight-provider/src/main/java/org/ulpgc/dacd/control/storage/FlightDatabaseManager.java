@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.storage;
+package org.ulpgc.dacd.control.storage;
 
 import org.ulpgc.dacd.model.Flight;
 import java.sql.*;
