@@ -1,6 +1,6 @@
-package org.ulpgc.dacd.flight.control;
+package org.ulpgc.dacd.control;
 
-import org.ulpgc.dacd.flight.model.Flight;
+import org.ulpgc.dacd.model.Flight;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

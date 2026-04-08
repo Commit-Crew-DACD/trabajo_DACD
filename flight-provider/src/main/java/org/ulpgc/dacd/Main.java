@@ -1,6 +1,6 @@
 package org.ulpgc.dacd;
 
-import org.ulpgc.dacd.flight.control.FlightService;
+import org.ulpgc.dacd.control.FlightService;
 import org.ulpgc.dacd.storage.FlightDatabaseManager;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
