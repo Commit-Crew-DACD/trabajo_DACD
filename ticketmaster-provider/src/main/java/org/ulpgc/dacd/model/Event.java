@@ -1,4 +1,4 @@
-package com.commitcrew.model;
+package org.ulpgc.dacd.model;
 
 public class Event {
     private final String id;
