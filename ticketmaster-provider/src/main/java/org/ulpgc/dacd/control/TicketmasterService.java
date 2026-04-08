@@ -17,7 +17,6 @@ public class TicketmasterService {
 
     public TicketmasterService() {
         this.client = new OkHttpClient();
-        // Recuerda configurar esta variable de entorno en IntelliJ
         this.apiKey = System.getenv("TICKETMASTER_KEY");
     }
 

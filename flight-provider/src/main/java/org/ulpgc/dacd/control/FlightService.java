@@ -14,7 +14,6 @@ import java.util.Set;
 
 public class FlightService {
     private final OkHttpClient client;
-    // Filtro de destinos solicitados
     private final Set<String> targetAirports = Set.of("MAD", "BCN");
 
     public FlightService() {
