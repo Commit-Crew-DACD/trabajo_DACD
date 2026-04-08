@@ -1,4 +1,4 @@
-package com.commitcrew.model;
+package org.ulpgc.dacd.model;
 
 public class Flight {
     private String flightNumber;
