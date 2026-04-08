@@ -40,8 +40,6 @@ public class FlightService {
             for (int i = 0; i < array.size(); i++) {
                 JsonObject f = array.get(i).getAsJsonObject();
                 String destination = f.get("iataOtro").getAsString();
-
-                // Filtrar: Solo nos interesan Madrid y Barcelona
                 if (targetAirports.contains(destination)) {
                     flights.add(new Flight(
                             f.get("numVuelo").getAsString(),
