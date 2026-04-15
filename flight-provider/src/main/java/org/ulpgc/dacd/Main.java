@@ -1,26 +1,25 @@
 package org.ulpgc.dacd;
 
+import org.ulpgc.dacd.control.FlightController;
+import org.ulpgc.dacd.control.FlightProvider;
 import org.ulpgc.dacd.control.FlightService;
 import org.ulpgc.dacd.control.storage.FlightDatabaseManager;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        FlightService service = new FlightService();
-        FlightDatabaseManager db = new FlightDatabaseManager();
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        if (args.length < 2) {
+            return;
+        }
 
-        System.out.println("Iniciando Módulo de Vuelos (LPA -> MAD/BCN)...");
+        String origin = args[0];
+        List<String> destinations = Arrays.asList(args).subList(1, args.length);
 
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                db.saveFlights(service.getFlights("LPA", "S"));
-                System.out.println("Datos de vuelos actualizados en SQLite.");
-            } catch (Exception e) {
-                System.err.println("Error en la ejecución programada: " + e.getMessage());
-            }
-        }, 0, 1, TimeUnit.HOURS); // Se ejecuta cada hora
+        FlightProvider provider = new FlightService(origin, destinations);
+        FlightDatabaseManager storage = new FlightDatabaseManager();
+
+        FlightController controller = new FlightController(provider, storage);
+        controller.execute();
     }
 }
