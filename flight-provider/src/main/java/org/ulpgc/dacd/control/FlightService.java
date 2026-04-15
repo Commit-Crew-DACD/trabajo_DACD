@@ -10,26 +10,31 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-public class FlightService {
+public class FlightService implements FlightProvider {
+    private final String origin;
+    private final List<String> destinations;
     private final OkHttpClient client;
-    private final Set<String> targetAirports = Set.of("MAD", "BCN");
 
-    public FlightService() {
+    public FlightService(String origin, List<String> destinations) {
+        this.origin = origin;
+        this.destinations = destinations;
         this.client = new OkHttpClient();
     }
 
-    public List<Flight> getFlights(String airport, String flightType) throws IOException {
+    @Override
+    public List<Flight> getFlights() throws IOException {
         List<Flight> flights = new ArrayList<>();
+
         String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos"
-                + "&airport=" + airport
-                + "&flightType=" + flightType
+                + "&airport=" + origin
+                + "&flightType=S"
                 + "&limit=100&dosDias=si";
 
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader("User-Agent", "Mozilla/5.0")
+                // User-Agent más real para evitar bloqueos
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
@@ -40,7 +45,8 @@ public class FlightService {
             for (int i = 0; i < array.size(); i++) {
                 JsonObject f = array.get(i).getAsJsonObject();
                 String destination = f.get("iataOtro").getAsString();
-                if (targetAirports.contains(destination)) {
+
+                if (destinations.contains(destination)) {
                     flights.add(new Flight(
                             f.get("numVuelo").getAsString(),
                             f.get("iataAena").getAsString(),
@@ -52,7 +58,7 @@ public class FlightService {
                             f.get("estado").getAsString(),
                             f.get("nombreCompania").getAsString(),
                             f.get("terminal").getAsString(),
-                            flightType
+                            "S"
                     ));
                 }
             }
