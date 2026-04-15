@@ -1,5 +1,6 @@
 package org.ulpgc.dacd;
 
+import org.ulpgc.dacd.control.EventProvider;
 import org.ulpgc.dacd.control.TicketmasterService;
 import org.ulpgc.dacd.control.storage.EventDatabaseManager;
 import java.util.concurrent.Executors;
@@ -8,19 +9,27 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        TicketmasterService service = new TicketmasterService();
+        if (args.length < 2) {
+            System.out.println("Error: Faltan argumentos. Uso: <Ciudad> <Intervalo_Horas>");
+            return;
+        }
+
+        String city = args[0];
+        int interval = Integer.parseInt(args[1]);
+
+        EventProvider provider = new TicketmasterService();
         EventDatabaseManager db = new EventDatabaseManager();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-        System.out.println("Iniciando Módulo de Eventos (Ticketmaster)...");
+        System.out.println("Iniciando Módulo de Eventos para: " + city);
 
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                db.saveEvents(service.getEvents("Las Palmas"));
-                System.out.println("Eventos actualizados en SQLite (events.db)");
+                db.saveEvents(provider.fetchEvents(city));
+                System.out.println("Eventos de " + city + " persistidos incrementalmente en la DB.");
             } catch (Exception e) {
-                System.err.println("Error en Ticketmaster: " + e.getMessage());
+                System.err.println("Error en la captura: " + e.getMessage());
             }
-        }, 0, 1, TimeUnit.HOURS);
+        }, 0, interval, TimeUnit.HOURS);
     }
 }

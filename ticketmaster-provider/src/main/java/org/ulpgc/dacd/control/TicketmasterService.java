@@ -7,11 +7,10 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TicketmasterService {
+public class TicketmasterService implements EventProvider {
     private final OkHttpClient client;
     private final String apiKey;
 
@@ -20,9 +19,10 @@ public class TicketmasterService {
         this.apiKey = System.getenv("TICKETMASTER_KEY");
     }
 
-    public List<Event> getEvents(String city) throws IOException {
+    @Override
+    public List<Event> fetchEvents(String city) throws Exception {
         if (apiKey == null || apiKey.isEmpty()) {
-            throw new IllegalStateException("API Key no encontrada. Configura TICKETMASTER_KEY.");
+            throw new IllegalStateException("API Key no encontrada. Configura TICKETMASTER_KEY en Environment Variables.");
         }
 
         String url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=" + apiKey + "&city=" + city;
@@ -43,9 +43,9 @@ public class TicketmasterService {
         JsonArray eventsArray = root.getAsJsonObject("_embedded").getAsJsonArray("events");
         for (int i = 0; i < eventsArray.size(); i++) {
             JsonObject e = eventsArray.get(i).getAsJsonObject();
-
             String venue = "N/A";
             String city = "N/A";
+
             if (e.has("_embedded") && e.getAsJsonObject("_embedded").has("venues")) {
                 JsonObject v = e.getAsJsonObject("_embedded").getAsJsonArray("venues").get(0).getAsJsonObject();
                 venue = v.get("name").getAsString();
