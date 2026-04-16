@@ -22,9 +22,9 @@ public class FlightController {
             try {
                 List<Flight> flights = flightProvider.getFlights();
                 databaseManager.saveFlights(flights);
+                System.out.println("Se han guardado/proyectado " + flights.size() + " vuelos.");
             } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+                System.err.println("Error: " + e.getMessage());            }
         }, 0, 1, TimeUnit.HOURS);
     }
 }
