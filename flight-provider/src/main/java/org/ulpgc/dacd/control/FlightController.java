@@ -22,6 +22,7 @@ public class FlightController {
             try {
                 List<Flight> flights = flightProvider.getFlights();
                 databaseManager.saveFlights(flights);
+                System.out.println("Registros guardados: " + flights.size());
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
