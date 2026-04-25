@@ -18,14 +18,18 @@ public class FlightController {
 
     public void execute() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                List<Flight> flights = flightProvider.getFlights();
+        scheduler.scheduleAtFixedRate(this::fetchAndSaveFlights, 0, 1, TimeUnit.HOURS);
+    }
+
+    private void fetchAndSaveFlights() {
+        try {
+            List<Flight> flights = flightProvider.getFlights();
+            if (!flights.isEmpty()) {
                 databaseManager.saveFlights(flights);
                 System.out.println("Registros guardados: " + flights.size());
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
             }
-        }, 0, 1, TimeUnit.HOURS);
+        } catch (Exception e) {
+            System.err.println("Error en la ejecución programada: " + e.getMessage());
+        }
     }
 }

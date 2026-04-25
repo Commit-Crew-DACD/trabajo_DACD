@@ -7,21 +7,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FlightDatabaseManager {
-    private static final String URL = "jdbc:sqlite:flights.db";
+    private final String url;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public FlightDatabaseManager() {
+    public FlightDatabaseManager(String dbPath) {
+        this.url = "jdbc:sqlite:" + dbPath;
         initDatabase();
     }
 
     private void initDatabase() {
-        try (Connection conn = DriverManager.getConnection(URL)) {
-            String sqlFlights = "CREATE TABLE IF NOT EXISTS flights (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "flight_number TEXT, origin TEXT, destination TEXT," +
-                    "destination_city TEXT, date TEXT, scheduled_time TEXT," +
-                    "estimated_time TEXT, status TEXT, airline TEXT," +
-                    "terminal TEXT, flight_type TEXT, captured_at TEXT);";
+        try (Connection conn = DriverManager.getConnection(url)) {
+            String sqlFlights = """
+                CREATE TABLE IF NOT EXISTS flights (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    flight_number TEXT, 
+                    origin TEXT, 
+                    destination TEXT,
+                    destination_city TEXT, 
+                    date TEXT, 
+                    scheduled_time TEXT,
+                    estimated_time TEXT, 
+                    status TEXT, 
+                    airline TEXT,
+                    terminal TEXT, 
+                    flight_type TEXT, 
+                    captured_at TEXT
+                );
+                """;
             conn.createStatement().execute(sqlFlights);
         } catch (SQLException e) {
             System.err.println("Error DB Vuelos: " + e.getMessage());
@@ -34,21 +46,21 @@ public class FlightDatabaseManager {
                 "flight_type, captured_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
         String timestamp = LocalDateTime.now().format(formatter);
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             for (Flight f : flights) {
-                pstmt.setString(1, f.getFlightNumber());
-                pstmt.setString(2, f.getOrigin());
-                pstmt.setString(3, f.getDestination());
-                pstmt.setString(4, f.getDestinationCity());
-                pstmt.setString(5, f.getDate());
-                pstmt.setString(6, f.getScheduledTime());
-                pstmt.setString(7, f.getEstimatedTime());
-                pstmt.setString(8, f.getStatus());
-                pstmt.setString(9, f.getAirline());
-                pstmt.setString(10, f.getTerminal());
-                pstmt.setString(11, f.getFlightType());
+                pstmt.setString(1, f.flightNumber());
+                pstmt.setString(2, f.origin());
+                pstmt.setString(3, f.destination());
+                pstmt.setString(4, f.destinationCity());
+                pstmt.setString(5, f.date());
+                pstmt.setString(6, f.scheduledTime());
+                pstmt.setString(7, f.estimatedTime());
+                pstmt.setString(8, f.status());
+                pstmt.setString(9, f.airline());
+                pstmt.setString(10, f.terminal());
+                pstmt.setString(11, f.flightType());
                 pstmt.setString(12, timestamp);
                 pstmt.addBatch();
             }

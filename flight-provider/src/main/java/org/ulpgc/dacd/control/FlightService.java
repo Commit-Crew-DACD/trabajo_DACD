@@ -25,31 +25,26 @@ public class FlightService implements FlightProvider {
     @Override
     public List<Flight> getFlights() throws IOException {
         List<Flight> flights = new ArrayList<>();
-
-        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos"
-                + "&airport=" + origin
-                + "&flightType=S"
-                + "&limit=100&dosDias=si";
+        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=" + origin + "&flightType=S&limit=100&dosDias=si";
 
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .addHeader("User-Agent", "Mozilla/5.0")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) return flights;
 
             JsonArray array = JsonParser.parseString(response.body().string()).getAsJsonArray();
-
             for (int i = 0; i < array.size(); i++) {
                 JsonObject f = array.get(i).getAsJsonObject();
-                String destination = f.get("iataOtro").getAsString();
+                String dest = f.get("iataOtro").getAsString();
 
-                if (destinations.contains(destination)) {
+                if (destinations.contains(dest)) {
                     flights.add(new Flight(
                             f.get("numVuelo").getAsString(),
                             f.get("iataAena").getAsString(),
-                            destination,
+                            dest,
                             f.get("ciudadIataOtro").getAsString(),
                             f.get("fecha").getAsString(),
                             f.get("horaProgramada").getAsString(),
