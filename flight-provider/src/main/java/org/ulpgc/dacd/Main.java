@@ -15,8 +15,7 @@ public class Main {
 
         String origin = args[0];
         List<String> destinations = new ArrayList<>(Arrays.asList(args).subList(1, args.length));
-        String brokerUrl = "tcp://localhost:61616";
-
+        String brokerUrl = "failover:(tcp://localhost:61616)?maxReconnectAttempts=10&initialReconnectDelay=1000&maxReconnectDelay=30000";
         FlightProvider scraper = new FlightService(origin, destinations);
         FlightProvider projector = new FlightProjectionService(scraper);
         JmsPublisher publisher = new JmsPublisher(brokerUrl, "Flight");

@@ -2,7 +2,7 @@ package org.ulpgc.dacd;
 
 public class Main {
     public static void main(String[] args) {
-        String brokerUrl = "tcp://localhost:61616";
+        String brokerUrl = "failover:(tcp://localhost:61616)?maxReconnectAttempts=10&initialReconnectDelay=1000&maxReconnectDelay=30000";
         String[] topics = {"Flight", "Prediction"};
 
         EventStoreWriter writer = new EventStoreWriter();
