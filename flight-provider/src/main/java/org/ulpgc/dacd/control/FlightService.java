@@ -29,22 +29,22 @@ public class FlightService implements FlightProvider {
 
         Request request = new Request.Builder()
                 .url(url)
-                .addHeader("User-Agent", "Mozilla/5.0")
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) return flights;
-
             JsonArray array = JsonParser.parseString(response.body().string()).getAsJsonArray();
+
             for (int i = 0; i < array.size(); i++) {
                 JsonObject f = array.get(i).getAsJsonObject();
-                String dest = f.get("iataOtro").getAsString();
+                String destination = f.get("iataOtro").getAsString();
 
-                if (destinations.contains(dest)) {
+                if (destinations.contains(destination)) {
                     flights.add(new Flight(
                             f.get("numVuelo").getAsString(),
                             f.get("iataAena").getAsString(),
-                            dest,
+                            destination,
                             f.get("ciudadIataOtro").getAsString(),
                             f.get("fecha").getAsString(),
                             f.get("horaProgramada").getAsString(),

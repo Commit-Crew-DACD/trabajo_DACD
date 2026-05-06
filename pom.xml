@@ -10,6 +10,7 @@
     <packaging>pom</packaging> <modules>
     <module>flight-provider</module>
     <module>ticketmaster-provider</module>
+    <module>messaging-service</module>
 </modules>
 
     <properties>
@@ -17,4 +18,14 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-client</artifactId>
+                <version>5.19.4</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
