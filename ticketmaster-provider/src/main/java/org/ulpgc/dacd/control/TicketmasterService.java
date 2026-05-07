@@ -29,7 +29,7 @@ public class TicketmasterService implements EventProvider {
         Request request = new Request.Builder().url(url).build();
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) return new ArrayList<>();
+            if (!response.isSuccessful() || response.body() == null) return new ArrayList<>();
             return parseJson(response.body().string());
         }
     }
@@ -52,13 +52,18 @@ public class TicketmasterService implements EventProvider {
                 city = v.getAsJsonObject("city").get("name").getAsString();
             }
 
+            JsonObject startDate = e.getAsJsonObject("dates").getAsJsonObject("start");
+            String date = startDate.get("localDate").getAsString();
+            String time = startDate.has("localTime") ? startDate.get("localTime").getAsString() : "N/A";
+
             events.add(new Event(
                     e.get("id").getAsString(),
                     e.get("name").getAsString(),
                     city,
                     venue,
-                    e.getAsJsonObject("dates").getAsJsonObject("start").get("localDate").getAsString(),
-                    e.get("url").getAsString()
+                    date,
+                    e.get("url").getAsString(),
+                    time
             ));
         }
         return events;
