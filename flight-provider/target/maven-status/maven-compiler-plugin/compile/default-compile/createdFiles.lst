@@ -1,4 +1,5 @@
 org\ulpgc\dacd\Main.class
-org\ulpgc\dacd\storage\FlightDatabaseManager.class
+org\ulpgc\dacd\control\JmsPublisher.class
+org\ulpgc\dacd\control\FlightController.class
 org\ulpgc\dacd\model\Flight.class
-org\ulpgc\dacd\control\FlightService.class
+org\ulpgc\dacd\control\FlightProvider.class

@@ -23,7 +23,7 @@ public class FlightController {
         try {
             publisher.connect();
         } catch (Exception e) {
-            System.err.println("Error conectando a ActiveMQ: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
             return;
         }
 
@@ -32,10 +32,8 @@ public class FlightController {
             try {
                 List<Flight> flights = flightProvider.getFlights();
                 for (Flight flight : flights) {
-                    String json = toJson(flight);
-                    publisher.publish(json);
+                    publisher.publish(toJson(flight));
                 }
-                System.out.println("Publicados " + flights.size() + " vuelos en ActiveMQ.");
             } catch (Exception e) {
                 System.err.println("Error: " + e.getMessage());
             }

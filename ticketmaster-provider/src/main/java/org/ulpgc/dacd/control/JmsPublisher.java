@@ -32,6 +32,8 @@ public class JmsPublisher {
     }
 
     public void close() throws JMSException {
+        if (producer != null) producer.close();
+        if (session != null) session.close();
         if (connection != null) connection.close();
     }
 }

@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ticketmaster-provider" />
         <module name="flight-provider" />
+        <module name="messaging-service" />
       </profile>
     </annotationProcessing>
   </component>

@@ -21,21 +21,21 @@ public class FlightProjectionService implements FlightProvider {
         List<Flight> allFlights = new ArrayList<>(realFlights);
 
         for (Flight f : realFlights) {
-            LocalDate originalDate = LocalDate.parse(f.getDate(), dateFormatter);
+            LocalDate originalDate = LocalDate.parse(f.date(), dateFormatter);
             for (int i = 1; i <= 4; i++) {
                 LocalDate projectedDate = originalDate.plusWeeks(i);
                 allFlights.add(new Flight(
-                        f.getFlightNumber(),
-                        f.getOrigin(),
-                        f.getDestination(),
-                        f.getDestinationCity(),
+                        f.flightNumber(),
+                        f.origin(),
+                        f.destination(),
+                        f.destinationCity(),
                         projectedDate.format(dateFormatter),
-                        f.getScheduledTime(),
-                        f.getEstimatedTime(),
-                        f.getStatus(),
-                        f.getAirline(),
-                        f.getTerminal(),
-                        f.getFlightType()
+                        f.scheduledTime(),
+                        f.estimatedTime(),
+                        f.status(),
+                        f.airline(),
+                        f.terminal(),
+                        f.flightType()
                 ));
             }
         }
