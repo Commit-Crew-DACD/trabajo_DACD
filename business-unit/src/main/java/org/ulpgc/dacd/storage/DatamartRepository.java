@@ -343,4 +343,30 @@ public class DatamartRepository {
             throw new RuntimeException("Error counting rows from " + table, e);
         }
     }
+    public void clearEvents() {
+        String sql = "DELETE FROM events;";
+
+        try (Connection connection = DriverManager.getConnection(URL);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error clearing events", e);
+        }
+    }
+
+    public void clearFlights() {
+        String sql = "DELETE FROM flights;";
+
+        try (Connection connection = DriverManager.getConnection(URL);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error clearing flights", e);
+        }
+    }
+
 }
