@@ -62,8 +62,8 @@ public class TicketmasterService implements EventProvider {
                     city,
                     venue,
                     date,
-                    e.get("url").getAsString(),
-                    time
+                    time,
+                    e.get("url").getAsString()
             ));
         }
         return events;

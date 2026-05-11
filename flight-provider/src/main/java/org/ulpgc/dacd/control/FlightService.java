@@ -25,7 +25,7 @@ public class FlightService implements FlightProvider {
     @Override
     public List<Flight> getFlights() throws IOException {
         List<Flight> flights = new ArrayList<>();
-        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=" + origin + "&flightType=S&limit=100&dosDias=si";
+        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=" + origin + "&flightType=S&limit=500&dosDias=si";
 
         Request request = new Request.Builder()
                 .url(url)

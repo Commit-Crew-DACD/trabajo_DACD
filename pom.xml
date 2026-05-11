@@ -10,7 +10,8 @@
     <packaging>pom</packaging> <modules>
     <module>flight-provider</module>
     <module>ticketmaster-provider</module>
-    <module>messaging-service</module>
+    <module>EventStoreBuilder</module>
+    <module>business-unit</module>
 </modules>
 
     <properties>
