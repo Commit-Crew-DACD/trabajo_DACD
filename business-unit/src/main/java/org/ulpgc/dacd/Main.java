@@ -5,6 +5,7 @@ import org.ulpgc.dacd.control.EventStoreLoader;
 import org.ulpgc.dacd.control.RecommendationService;
 import org.ulpgc.dacd.model.RecommendationConfig;
 import org.ulpgc.dacd.storage.DatamartRepository;
+import org.ulpgc.dacd.control.RestApi;
 
 public class Main {
     public static void main(String[] args) {
@@ -27,5 +28,7 @@ public class Main {
         System.out.println("Events loaded: " + repository.countEvents());
         System.out.println("Flights loaded: " + repository.countFlights());
         System.out.println("Recommendations generated: " + repository.countRecommendations());
+        RestApi restApi = new RestApi(repository, 7070);
+        restApi.start();
     }
 }
