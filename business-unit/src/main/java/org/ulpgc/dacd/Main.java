@@ -28,7 +28,7 @@ public class Main {
         System.out.println("Events loaded: " + repository.countEvents());
         System.out.println("Flights loaded: " + repository.countFlights());
         System.out.println("Recommendations generated: " + repository.countRecommendations());
-        RestApi restApi = new RestApi(repository, 7070);
+        RestApi restApi = new RestApi(repository, recommendationService, 7070);
         restApi.start();
     }
 }

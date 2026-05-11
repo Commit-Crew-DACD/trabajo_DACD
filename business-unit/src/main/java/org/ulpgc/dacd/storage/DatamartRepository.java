@@ -72,4 +72,8 @@ public class DatamartRepository {
     public int countRecommendations() {
         return recommendationRepository.count();
     }
+
+    public void saveConfig(RecommendationConfig config) {
+        configRepository.saveConfig(config);
+    }
 }

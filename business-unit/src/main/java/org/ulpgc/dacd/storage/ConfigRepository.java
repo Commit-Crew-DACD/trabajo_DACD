@@ -41,4 +41,28 @@ public class ConfigRepository {
             throw new RuntimeException("Error reading recommendation config", e);
         }
     }
+    public void saveConfig(RecommendationConfig config) {
+        String sql = """
+            INSERT OR REPLACE INTO recommendation_config (
+                id,
+                origin_airport,
+                outbound_margin_hours,
+                return_margin_hours,
+                default_event_duration_hours
+            ) VALUES (1, ?, ?, ?, ?);
+            """;
+
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, config.getOriginAirport());
+            statement.setInt(2, config.getOutboundMarginHours());
+            statement.setInt(3, config.getReturnMarginHours());
+            statement.setInt(4, config.getDefaultEventDurationHours());
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error saving recommendation config", e);
+        }
+    }
 }
