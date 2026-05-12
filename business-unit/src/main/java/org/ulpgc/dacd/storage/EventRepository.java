@@ -41,7 +41,8 @@ public class EventRepository {
     public List<Event> findAll() {
         String sql = """
                 SELECT id, name, city, venue, date, start_time, url, captured_at
-                FROM events;
+                FROM events
+                ORDER BY date, start_time, name;
                 """;
 
         List<Event> events = new ArrayList<>();

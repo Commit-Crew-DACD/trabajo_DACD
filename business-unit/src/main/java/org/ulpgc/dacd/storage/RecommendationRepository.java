@@ -66,7 +66,8 @@ public class RecommendationRepository {
                        return_origin, return_destination,
                        return_departure_time, captured_at
                 FROM flight_event_recommendations
-                ORDER BY event_date, event_start_time;
+                ORDER BY event_date, event_start_time, event_name,
+                         outbound_arrival_time DESC, return_departure_time ASC;
                 """;
 
         List<Recommendation> recommendations = new ArrayList<>();
