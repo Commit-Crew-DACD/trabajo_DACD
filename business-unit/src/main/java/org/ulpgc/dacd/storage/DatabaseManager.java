@@ -35,7 +35,6 @@ public class DatabaseManager {
 
             statement.execute("""
                     CREATE TABLE IF NOT EXISTS flights (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                         flight_number TEXT,
                         origin TEXT,
                         destination TEXT,
@@ -47,7 +46,8 @@ public class DatabaseManager {
                         airline TEXT,
                         terminal TEXT,
                         flight_type TEXT,
-                        captured_at TEXT
+                        captured_at TEXT,
+                        PRIMARY KEY (flight_number, date, airline)
                     );
                     """);
 

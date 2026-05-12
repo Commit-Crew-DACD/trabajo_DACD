@@ -3,7 +3,7 @@ package org.ulpgc.dacd;
 public class Main {
     public static void main(String[] args) {
         String brokerUrl = "failover:(tcp://localhost:61616)?maxReconnectAttempts=10&initialReconnectDelay=1000&maxReconnectDelay=30000";
-        String[] topics = {"Flight", "Prediction"};
+        String[] topics = {"Flight", "Ticketmaster"};
 
         EventStoreWriter writer = new EventStoreWriter();
         JmsSubscriber subscriber = new JmsSubscriber(brokerUrl, topics, writer);

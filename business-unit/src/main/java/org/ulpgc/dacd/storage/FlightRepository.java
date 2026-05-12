@@ -15,12 +15,12 @@ public class FlightRepository {
 
     public void save(Flight flight) {
         String sql = """
-                INSERT INTO flights (
-                    flight_number, origin, destination, destination_city,
-                    date, scheduled_time, estimated_time, status, airline,
-                    terminal, flight_type, captured_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-                """;
+            INSERT OR REPLACE INTO flights (
+                flight_number, origin, destination, destination_city,
+                date, scheduled_time, estimated_time, status, airline,
+                terminal, flight_type, captured_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            """;
 
         try (Connection connection = databaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

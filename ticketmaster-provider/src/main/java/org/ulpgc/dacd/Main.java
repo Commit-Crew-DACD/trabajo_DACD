@@ -23,7 +23,7 @@ public class Main {
         int interval = Integer.parseInt(args[1]);
         String brokerUrl = "failover:(tcp://localhost:61616)?maxReconnectAttempts=10&initialReconnectDelay=1000&maxReconnectDelay=30000";
         EventProvider provider = new TicketmasterService();
-        JmsPublisher publisher = new JmsPublisher(brokerUrl, "Prediction");
+        JmsPublisher publisher = new JmsPublisher(brokerUrl, "Ticketmaster");
 
         try {
             publisher.connect();

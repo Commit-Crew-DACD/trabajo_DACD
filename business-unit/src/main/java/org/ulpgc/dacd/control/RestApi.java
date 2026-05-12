@@ -407,6 +407,12 @@ public class RestApi {
             config.routes.get("/api/config",
                     context -> context.json(repository.getConfig()));
 
+            config.routes.get("/api/events",
+                    context -> context.json(repository.findAllEvents()));
+
+            config.routes.get("/api/flights",
+                    context -> context.json(repository.findAllFlights()));
+
             config.routes.post("/api/config", context -> {
                 ConfigRequest request = context.bodyAsClass(ConfigRequest.class);
 
