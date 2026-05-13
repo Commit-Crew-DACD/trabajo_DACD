@@ -12,9 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RecommendationService {
     private static final DateTimeFormatter EVENT_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
@@ -33,7 +31,7 @@ public class RecommendationService {
     public void rebuildRecommendations() {
         RecommendationConfig config = repository.getConfig();
         List<Event> events = repository.findAllEvents();
-        List<Flight> flights = expandFlightsToEventWindow(repository.findAllFlights(), events);
+        List<Flight> flights = repository.findAllFlights();
 
         System.out.println("Rebuilding recommendations...");
         System.out.println("Events: " + events.size());
@@ -99,69 +97,6 @@ public class RecommendationService {
                 && event.getStartTime() != null
                 && !event.getStartTime().isBlank()
                 && !"N/A".equalsIgnoreCase(event.getStartTime());
-    }
-
-    private List<Flight> expandFlightsToEventWindow(List<Flight> flights, List<Event> events) {
-        LocalDate latestRelevantDate = latestRelevantEventDate(events);
-
-        if (latestRelevantDate == null) {
-            return flights;
-        }
-
-        Map<String, Flight> expandedFlights = new LinkedHashMap<>();
-
-        for (Flight flight : flights) {
-            expandedFlights.put(flightKey(flight), flight);
-
-            LocalDate originalDate = parseFlightDate(flight);
-
-            LocalDate projectedDate = originalDate.plusWeeks(1);
-            while (!projectedDate.isAfter(latestRelevantDate)) {
-                Flight projectedFlight = new Flight(
-                        flight.getFlightNumber(),
-                        flight.getOrigin(),
-                        flight.getDestination(),
-                        flight.getDestinationCity(),
-                        projectedDate.format(FLIGHT_DATE_FORMATTER),
-                        flight.getScheduledTime(),
-                        flight.getEstimatedTime(),
-                        flight.getStatus(),
-                        flight.getAirline(),
-                        flight.getTerminal(),
-                        flight.getFlightType(),
-                        flight.getCapturedAt()
-                );
-
-                expandedFlights.putIfAbsent(flightKey(projectedFlight), projectedFlight);
-                projectedDate = projectedDate.plusWeeks(1);
-            }
-        }
-
-        return List.copyOf(expandedFlights.values());
-    }
-
-    private LocalDate latestRelevantEventDate(List<Event> events) {
-        return events.stream()
-                .filter(this::isValidEvent)
-                .map(event -> LocalDate.parse(event.getDate(), EVENT_DATE_FORMATTER))
-                .max(LocalDate::compareTo)
-                .map(date -> date.plusDays((MAX_RETURN_MARGIN_HOURS + 23L) / 24L))
-                .orElse(null);
-    }
-
-    private String flightKey(Flight flight) {
-        return String.join("|",
-                safeValue(flight.getFlightNumber()),
-                safeValue(flight.getOrigin()),
-                safeValue(flight.getDestination()),
-                safeValue(flight.getDate()),
-                safeValue(flight.getScheduledTime()),
-                safeValue(flight.getEstimatedTime()),
-                safeValue(flight.getAirline()));
-    }
-
-    private String safeValue(String value) {
-        return value == null ? "" : value;
     }
 
     private boolean isOutboundFlight(Flight flight, Event event, RecommendationConfig config) {

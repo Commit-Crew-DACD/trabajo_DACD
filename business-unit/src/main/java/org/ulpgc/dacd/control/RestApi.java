@@ -14,13 +14,9 @@ public class RestApi {
                 <title>Agenda vuelo + evento</title>
                 <style>
                     :root {
-                        color-scheme: light;
-                        --bg: #f4f7f8;
-                        --bg-soft: #edf5f6;
-                        --surface: rgba(255, 255, 255, 0.94);
-                        --surface-strong: #ffffff;
+                        --surface: #ffffff;
+                        --surface-soft: #f8fbfc;
                         --border: #d8e3e6;
-                        --border-strong: #c3d3d7;
                         --ink: #162126;
                         --muted: #5f7078;
                         --accent: #0f766e;
@@ -30,18 +26,14 @@ public class RestApi {
                         --success-soft: #dcfce7;
                         --warning: #9a3412;
                         --warning-soft: #ffedd5;
+                        --danger: #991b1b;
+                        --danger-soft: #fff7f7;
                         --shadow: 0 24px 60px rgba(15, 118, 110, 0.08);
-                        --radius-xl: 28px;
-                        --radius-lg: 22px;
-                        --radius-md: 18px;
-                        --radius-sm: 12px;
                         --font-body: "Plus Jakarta Sans", "Segoe UI", sans-serif;
                         --font-heading: "Space Grotesk", "Segoe UI", sans-serif;
                     }
 
-                    * {
-                        box-sizing: border-box;
-                    }
+                    * { box-sizing: border-box; }
 
                     body {
                         margin: 0;
@@ -53,14 +45,7 @@ public class RestApi {
                             linear-gradient(180deg, #f7fbfb 0%, #eef3f4 100%);
                     }
 
-                    a {
-                        color: inherit;
-                    }
-
-                    button,
-                    input {
-                        font: inherit;
-                    }
+                    button, input { font: inherit; }
 
                     .page-shell {
                         width: min(1240px, calc(100% - 32px));
@@ -73,7 +58,7 @@ public class RestApi {
                         grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.95fr);
                         gap: 24px;
                         padding: 36px;
-                        border-radius: var(--radius-xl);
+                        border-radius: 28px;
                         background: linear-gradient(135deg, #0f1720 0%, #143339 62%, #0f766e 100%);
                         color: #f8fafc;
                         box-shadow: 0 30px 70px rgba(15, 23, 32, 0.2);
@@ -82,25 +67,26 @@ public class RestApi {
                     .hero-copy {
                         display: flex;
                         flex-direction: column;
-                        gap: 18px;
                         justify-content: space-between;
+                        gap: 18px;
                     }
 
-                    .hero-eyebrow {
+                    .hero-eyebrow, .search-label, .filter-label, .eyebrow {
                         margin: 0;
                         font-size: 12px;
                         font-weight: 700;
-                        letter-spacing: 0.18em;
+                        letter-spacing: 0.12em;
                         text-transform: uppercase;
-                        color: #b8f1ea;
                     }
+
+                    .hero-eyebrow, .search-label, .filter-label { color: #c8f7f0; }
+                    .eyebrow { color: var(--accent); margin-bottom: 8px; }
 
                     .hero h1 {
                         margin: 0;
                         font-family: var(--font-heading);
                         font-size: clamp(32px, 5vw, 48px);
                         line-height: 1.05;
-                        letter-spacing: -0.04em;
                     }
 
                     .hero p {
@@ -117,8 +103,6 @@ public class RestApi {
                     }
 
                     .highlight-pill {
-                        display: inline-flex;
-                        align-items: center;
                         padding: 10px 14px;
                         border: 1px solid rgba(184, 241, 234, 0.18);
                         border-radius: 999px;
@@ -128,40 +112,22 @@ public class RestApi {
                     }
 
                     .hero-panel {
-                        display: flex;
-                        flex-direction: column;
+                        display: grid;
                         gap: 16px;
                         padding: 24px;
                         border: 1px solid rgba(226, 232, 240, 0.12);
-                        border-radius: var(--radius-lg);
+                        border-radius: 22px;
                         background: rgba(255, 255, 255, 0.1);
                         backdrop-filter: blur(10px);
                     }
 
                     .hero-panel h2 {
-                        margin: 0;
+                        margin: 0 0 8px;
                         font-family: var(--font-heading);
                         font-size: 20px;
-                        letter-spacing: -0.03em;
                     }
 
-                    .hero-panel p {
-                        color: rgba(241, 245, 249, 0.78);
-                    }
-
-                    .search-field {
-                        display: block;
-                    }
-
-                    .search-label {
-                        display: block;
-                        margin-bottom: 8px;
-                        font-size: 12px;
-                        font-weight: 700;
-                        letter-spacing: 0.1em;
-                        text-transform: uppercase;
-                        color: #c8f7f0;
-                    }
+                    .search-field, .availability-filter { display: grid; gap: 8px; }
 
                     .search-field input {
                         width: 100%;
@@ -173,13 +139,29 @@ public class RestApi {
                         outline: none;
                     }
 
-                    .search-field input::placeholder {
-                        color: rgba(226, 232, 240, 0.65);
+                    .search-field input::placeholder { color: rgba(226, 232, 240, 0.65); }
+
+                    .filter-options {
+                        display: grid;
+                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                        gap: 8px;
                     }
 
-                    .search-field input:focus {
-                        border-color: rgba(184, 241, 234, 0.55);
-                        background: rgba(248, 250, 252, 0.18);
+                    .filter-option {
+                        border: 1px solid rgba(226, 232, 240, 0.22);
+                        border-radius: 12px;
+                        padding: 10px 12px;
+                        background: rgba(248, 250, 252, 0.12);
+                        color: rgba(248, 250, 252, 0.82);
+                        font-size: 13px;
+                        font-weight: 700;
+                        cursor: pointer;
+                    }
+
+                    .filter-option.active {
+                        border-color: rgba(184, 241, 234, 0.7);
+                        background: #f8fafc;
+                        color: #0f1720;
                     }
 
                     .panel-actions {
@@ -198,23 +180,14 @@ public class RestApi {
                         color: #0f1720;
                         font-weight: 700;
                         cursor: pointer;
-                        transition: transform 0.18s ease, box-shadow 0.18s ease;
                     }
 
-                    .panel-actions button:hover {
-                        transform: translateY(-1px);
-                        box-shadow: 0 12px 24px rgba(15, 23, 32, 0.16);
-                    }
-
-                    .results-label,
-                    .status-message {
+                    .results-label, .status-message {
                         font-size: 13px;
                         color: rgba(241, 245, 249, 0.78);
                     }
 
-                    .status-message.error {
-                        color: #fee2e2;
-                    }
+                    .status-message.error { color: #fee2e2; }
 
                     .main-content {
                         display: grid;
@@ -228,12 +201,15 @@ public class RestApi {
                         gap: 16px;
                     }
 
+                    .metric-card, .events-panel {
+                        border: 1px solid var(--border);
+                        background: rgba(255, 255, 255, 0.94);
+                        box-shadow: var(--shadow);
+                    }
+
                     .metric-card {
                         padding: 20px;
-                        border: 1px solid var(--border);
-                        border-radius: var(--radius-md);
-                        background: var(--surface);
-                        box-shadow: var(--shadow);
+                        border-radius: 18px;
                     }
 
                     .metric-card span {
@@ -250,7 +226,6 @@ public class RestApi {
                         display: block;
                         font-family: var(--font-heading);
                         font-size: clamp(26px, 4vw, 34px);
-                        letter-spacing: -0.04em;
                     }
 
                     .metric-card small {
@@ -262,10 +237,7 @@ public class RestApi {
 
                     .events-panel {
                         padding: 28px;
-                        border: 1px solid var(--border);
-                        border-radius: var(--radius-xl);
-                        background: var(--surface);
-                        box-shadow: var(--shadow);
+                        border-radius: 28px;
                     }
 
                     .section-header {
@@ -277,20 +249,10 @@ public class RestApi {
                         margin-bottom: 24px;
                     }
 
-                    .eyebrow {
-                        margin: 0 0 8px;
-                        font-size: 12px;
-                        font-weight: 700;
-                        letter-spacing: 0.12em;
-                        text-transform: uppercase;
-                        color: var(--accent);
-                    }
-
                     .section-header h2 {
                         margin: 0;
                         font-family: var(--font-heading);
                         font-size: clamp(26px, 4vw, 34px);
-                        letter-spacing: -0.04em;
                     }
 
                     .section-copy {
@@ -307,14 +269,12 @@ public class RestApi {
 
                     .event-card {
                         border: 1px solid var(--border);
-                        border-radius: var(--radius-lg);
-                        background: var(--surface-strong);
+                        border-radius: 22px;
+                        background: var(--surface);
                         overflow: hidden;
-                        transition: border-color 0.2s ease, box-shadow 0.2s ease;
                     }
 
                     .event-card[open] {
-                        border-color: var(--border-strong);
                         box-shadow: 0 20px 40px rgba(15, 23, 32, 0.08);
                     }
 
@@ -328,9 +288,7 @@ public class RestApi {
                         list-style: none;
                     }
 
-                    .event-summary::-webkit-details-marker {
-                        display: none;
-                    }
+                    .event-summary::-webkit-details-marker { display: none; }
 
                     .event-summary-main {
                         display: flex;
@@ -345,13 +303,12 @@ public class RestApi {
                         min-width: 86px;
                         padding: 14px 12px;
                         border-radius: 16px;
-                        background: var(--bg-soft);
+                        background: #edf5f6;
                         color: var(--accent-strong);
                         text-align: center;
                     }
 
                     .date-badge strong {
-                        display: block;
                         font-family: var(--font-heading);
                         font-size: 24px;
                         line-height: 1;
@@ -362,11 +319,6 @@ public class RestApi {
                         font-size: 12px;
                         font-weight: 700;
                         text-transform: uppercase;
-                        letter-spacing: 0.08em;
-                    }
-
-                    .event-copy {
-                        min-width: 0;
                     }
 
                     .event-copy h3 {
@@ -385,36 +337,22 @@ public class RestApi {
                         display: flex;
                         flex-wrap: wrap;
                         gap: 10px;
-                        align-items: center;
-                        justify-content: end;
+                        justify-content: flex-end;
                     }
 
-                    .availability-chip,
-                    .summary-action {
+                    .availability-chip, .summary-action, .option-rank {
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 10px 14px;
                         border-radius: 999px;
                         font-size: 13px;
                         font-weight: 700;
                     }
 
-                    .availability-chip.available {
-                        background: var(--success-soft);
-                        color: var(--success);
-                    }
-
-                    .availability-chip.unavailable {
-                        background: var(--warning-soft);
-                        color: var(--warning);
-                    }
-
-                    .summary-action {
-                        border: 1px solid var(--border);
-                        color: var(--ink);
-                        background: #f8fafc;
-                    }
+                    .availability-chip, .summary-action { padding: 10px 14px; }
+                    .availability-chip.available { background: var(--success-soft); color: var(--success); }
+                    .availability-chip.unavailable { background: var(--warning-soft); color: var(--warning); }
+                    .summary-action { border: 1px solid var(--border); background: #f8fafc; color: var(--ink); }
 
                     .event-card[open] .summary-action {
                         border-color: transparent;
@@ -435,14 +373,17 @@ public class RestApi {
                         margin-bottom: 18px;
                     }
 
-                    .meta-card {
-                        padding: 14px 16px;
+                    .meta-card, .flight-card, .option-card {
                         border: 1px solid var(--border);
-                        border-radius: 16px;
-                        background: #fbfdfe;
+                        background: var(--surface-soft);
                     }
 
-                    .meta-card span {
+                    .meta-card {
+                        padding: 14px 16px;
+                        border-radius: 16px;
+                    }
+
+                    .meta-card span, .flight-card span {
                         display: block;
                         margin-bottom: 6px;
                         font-size: 11px;
@@ -452,17 +393,13 @@ public class RestApi {
                         color: var(--muted);
                     }
 
-                    .meta-card strong,
-                    .meta-card a {
+                    .meta-card strong, .meta-card a {
                         font-size: 14px;
-                        line-height: 1.5;
                         color: var(--ink);
                         text-decoration: none;
                     }
 
-                    .meta-card a:hover {
-                        color: var(--accent-strong);
-                    }
+                    .meta-card a:hover { color: var(--accent-strong); }
 
                     .recommendations-grid {
                         display: grid;
@@ -471,7 +408,6 @@ public class RestApi {
 
                     .option-card {
                         padding: 18px;
-                        border: 1px solid var(--border);
                         border-radius: 18px;
                         background: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
                     }
@@ -486,14 +422,10 @@ public class RestApi {
                     }
 
                     .option-rank {
-                        display: inline-flex;
-                        align-items: center;
                         padding: 8px 12px;
-                        border-radius: 999px;
                         background: var(--accent-soft);
                         color: var(--accent-strong);
                         font-size: 12px;
-                        font-weight: 700;
                         letter-spacing: 0.08em;
                         text-transform: uppercase;
                     }
@@ -511,26 +443,23 @@ public class RestApi {
 
                     .flight-card {
                         padding: 16px;
-                        border: 1px solid var(--border);
                         border-radius: 16px;
                         background: #ffffff;
-                    }
-
-                    .flight-card span {
-                        display: block;
-                        margin-bottom: 8px;
-                        font-size: 11px;
-                        font-weight: 700;
-                        letter-spacing: 0.1em;
-                        text-transform: uppercase;
-                        color: var(--muted);
                     }
 
                     .flight-card h4 {
                         margin: 0 0 12px;
                         font-family: var(--font-heading);
                         font-size: 22px;
-                        letter-spacing: -0.04em;
+                    }
+
+                    .flight-card h4 a {
+                        color: var(--accent-strong);
+                        text-decoration: none;
+                    }
+
+                    .flight-card h4 a:hover {
+                        text-decoration: underline;
                     }
 
                     .detail-grid {
@@ -542,7 +471,6 @@ public class RestApi {
                         display: flex;
                         justify-content: space-between;
                         gap: 12px;
-                        align-items: baseline;
                         padding-top: 10px;
                         border-top: 1px solid #edf2f4;
                     }
@@ -555,22 +483,17 @@ public class RestApi {
                     .detail-row strong {
                         color: var(--muted);
                         font-size: 13px;
-                        font-weight: 600;
                     }
 
                     .detail-row span {
-                        margin: 0;
                         font-size: 14px;
                         font-weight: 600;
-                        letter-spacing: 0;
-                        text-transform: none;
-                        color: var(--ink);
                     }
 
                     .empty-state {
                         padding: 28px;
-                        border: 1px dashed var(--border-strong);
-                        border-radius: var(--radius-lg);
+                        border: 1px dashed #c3d3d7;
+                        border-radius: 22px;
                         background: #fbfdfe;
                         color: var(--muted);
                         line-height: 1.6;
@@ -578,62 +501,26 @@ public class RestApi {
 
                     .empty-state.error-state {
                         border-color: #fecaca;
-                        background: #fff7f7;
-                        color: #991b1b;
+                        background: var(--danger-soft);
+                        color: var(--danger);
                     }
 
                     @media (max-width: 1080px) {
-                        .overview-grid,
-                        .event-meta-grid {
-                            grid-template-columns: repeat(2, minmax(0, 1fr));
-                        }
+                        .overview-grid, .event-meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
                     }
 
                     @media (max-width: 920px) {
-                        .hero {
-                            grid-template-columns: 1fr;
-                        }
+                        .hero { grid-template-columns: 1fr; }
                     }
 
                     @media (max-width: 760px) {
-                        .page-shell {
-                            width: min(100% - 20px, 1240px);
-                            padding-top: 12px;
-                        }
-
-                        .hero,
-                        .events-panel {
-                            padding: 22px;
-                        }
-
-                        .overview-grid,
-                        .event-meta-grid,
-                        .flight-columns {
-                            grid-template-columns: 1fr;
-                        }
-
-                        .event-summary,
-                        .event-summary-main {
-                            align-items: flex-start;
-                        }
-
-                        .event-summary {
-                            flex-direction: column;
-                        }
-
-                        .event-summary-side {
-                            width: 100%;
-                            justify-content: flex-start;
-                        }
-
-                        .date-badge {
-                            min-width: 78px;
-                        }
-
-                        .detail-row {
-                            flex-direction: column;
-                            align-items: flex-start;
-                        }
+                        .page-shell { width: min(100% - 20px, 1240px); padding-top: 12px; }
+                        .hero, .events-panel { padding: 22px; }
+                        .overview-grid, .event-meta-grid, .flight-columns, .filter-options { grid-template-columns: 1fr; }
+                        .event-summary, .event-summary-main { align-items: flex-start; }
+                        .event-summary { flex-direction: column; }
+                        .event-summary-side { justify-content: flex-start; }
+                        .detail-row { flex-direction: column; }
                     }
                 </style>
             </head>
@@ -646,28 +533,36 @@ public class RestApi {
                                 <h1>Todos los eventos y sus mejores opciones de vuelo en una sola vista.</h1>
                             </div>
                             <p>
-                                La interfaz trabaja sobre el datamart completo de eventos y solo despliega los vuelos
-                                cuando abres el evento que te interesa. Asi no se pierde informacion aunque el conjunto
-                                de datos abarque varias semanas o meses.
+                                La interfaz trabaja sobre el datamart completo de eventos y despliega los vuelos
+                                cuando abres el evento que te interesa.
                             </p>
                             <div class="hero-highlights">
                                 <span class="highlight-pill">Eventos completos</span>
-                                <span class="highlight-pill">Opciones de ida y vuelta por evento</span>
-                                <span class="highlight-pill">Vista limpia para consulta rapida</span>
+                                <span class="highlight-pill">Opciones por evento</span>
+                                <span class="highlight-pill">Consulta rapida</span>
                             </div>
                         </div>
 
                         <aside class="hero-panel">
                             <div>
                                 <h2>Busqueda y estado</h2>
-                                <p>Filtra por evento, ciudad, recinto, aeropuertos, aerolinea o numero de vuelo.</p>
+                                <p>Filtra por evento, ciudad, recinto, aeropuerto, aerolinea o numero de vuelo.</p>
                             </div>
 
                             <label class="search-field" for="searchInput">
                                 <span class="search-label">Buscar</span>
                                 <input id="searchInput" type="search"
-                                       placeholder="Ej. Madrid, Bad Bunny, LPA, Iberia, WiZink Center">
+                                       placeholder="Ej. Madrid, Bad Bunny, LPA, Iberia">
                             </label>
+
+                            <div class="availability-filter">
+                                <span class="filter-label">Mostrar</span>
+                                <div class="filter-options">
+                                    <button class="filter-option active" type="button" data-filter="all">Todos</button>
+                                    <button class="filter-option" type="button" data-filter="with">Con vuelos</button>
+                                    <button class="filter-option" type="button" data-filter="without">Sin vuelos</button>
+                                </div>
+                            </div>
 
                             <div class="panel-actions">
                                 <button id="refreshButton" type="button">Actualizar datos</button>
@@ -688,7 +583,7 @@ public class RestApi {
                             <article class="metric-card">
                                 <span>Con opciones</span>
                                 <strong id="coveredEventsCount">-</strong>
-                                <small>Eventos que ya tienen al menos una combinacion de vuelos.</small>
+                                <small>Eventos con al menos una combinacion de vuelos.</small>
                             </article>
                             <article class="metric-card">
                                 <span>Combinaciones</span>
@@ -709,8 +604,8 @@ public class RestApi {
                                     <h2>Eventos disponibles</h2>
                                 </div>
                                 <p class="section-copy">
-                                    Pulsa sobre cualquier evento para desplegar las opciones de vuelo asociadas.
-                                    Si un evento no tiene combinaciones compatibles, tambien se mostrara.
+                                    Pulsa sobre cualquier evento para desplegar sus opciones de vuelo. Los eventos sin
+                                    combinaciones siguen visibles para reflejar toda la agenda cargada.
                                 </p>
                             </div>
 
@@ -726,13 +621,14 @@ public class RestApi {
                         events: [],
                         flights: [],
                         recommendations: [],
-                        displayEvents: []
+                        displayEvents: [],
+                        availabilityFilter: 'all'
                     };
 
                     async function loadData() {
                         const stamp = Date.now();
-                        const eventsContainer = document.getElementById('eventsContainer');
-                        eventsContainer.innerHTML = '<div class="empty-state">Actualizando datos del datamart...</div>';
+                        document.getElementById('eventsContainer').innerHTML =
+                            '<div class="empty-state">Actualizando datos del datamart...</div>';
                         setStatusMessage('Actualizando eventos, vuelos y recomendaciones...', false);
 
                         try {
@@ -779,7 +675,9 @@ public class RestApi {
 
                     function renderEvents() {
                         const query = normalizeText(document.getElementById('searchInput').value);
-                        const filteredEvents = state.displayEvents.filter(event => matchesEvent(event, event.options, query));
+                        const filteredEvents = state.displayEvents
+                            .filter(matchesAvailabilityFilter)
+                            .filter(event => matchesEvent(event, event.options, query));
 
                         document.getElementById('resultsLabel').textContent =
                             `${filteredEvents.length} eventos visibles de ${state.displayEvents.length}`;
@@ -789,7 +687,7 @@ public class RestApi {
                         if (filteredEvents.length === 0) {
                             eventsContainer.innerHTML = `
                                 <div class="empty-state">
-                                    No hay eventos que coincidan con la busqueda actual.
+                                    No hay eventos que coincidan con los filtros actuales.
                                 </div>
                             `;
                             return;
@@ -798,6 +696,18 @@ public class RestApi {
                         eventsContainer.innerHTML = filteredEvents
                             .map(event => renderEventCard(event, event.options))
                             .join('');
+                    }
+
+                    function matchesAvailabilityFilter(event) {
+                        if (state.availabilityFilter === 'with') {
+                            return event.options.length > 0;
+                        }
+
+                        if (state.availabilityFilter === 'without') {
+                            return event.options.length === 0;
+                        }
+
+                        return true;
                     }
 
                     function renderEventCard(event, options) {
@@ -814,13 +724,11 @@ public class RestApi {
                                             <strong>${escapeHtml(formatShortDay(event.date))}</strong>
                                             <span>${escapeHtml(formatShortMonth(event.date))}</span>
                                         </div>
-
                                         <div class="event-copy">
                                             <h3>${escapeHtml(event.name || 'Evento sin nombre')}</h3>
                                             <p>${escapeHtml(buildEventSubtitle(event))}</p>
                                         </div>
                                     </div>
-
                                     <div class="event-summary-side">
                                         <span class="availability-chip ${availabilityClass}">${escapeHtml(availabilityLabel)}</span>
                                         <span class="summary-action">Ver detalle</span>
@@ -846,7 +754,6 @@ public class RestApi {
                                             ${renderEventLink(event.url)}
                                         </div>
                                     </div>
-
                                     ${renderRecommendations(options)}
                                 </div>
                             </details>
@@ -857,8 +764,7 @@ public class RestApi {
                         if (options.length === 0) {
                             return `
                                 <div class="empty-state">
-                                    Este evento sigue visible en la agenda, pero no se han encontrado combinaciones
-                                    de vuelo compatibles en los datos cargados.
+                                    Este evento esta en la agenda, pero aun no tiene combinaciones de vuelo compatibles.
                                 </div>
                             `;
                         }
@@ -881,7 +787,14 @@ public class RestApi {
                                 <div class="flight-columns">
                                     <section class="flight-card">
                                         <span>Vuelo de ida</span>
-                                        <h4>${escapeHtml(`${option.outboundOrigin} -> ${option.outboundDestination}`)}</h4>
+                                        <h4>${renderFlightLink(
+                                            `${option.outboundOrigin} -> ${option.outboundDestination}`,
+                                            option.outboundFlightNumber,
+                                            option.outboundDepartureTime,
+                                            option.outboundOrigin,
+                                            option.outboundDestination
+                                        )}</h4>
+            
                                         <div class="detail-grid">
                                             <div class="detail-row">
                                                 <strong>Aerolinea</strong>
@@ -900,7 +813,13 @@ public class RestApi {
 
                                     <section class="flight-card">
                                         <span>Vuelo de vuelta</span>
-                                        <h4>${escapeHtml(`${option.returnOrigin} -> ${option.returnDestination}`)}</h4>
+                                        <h4>${renderFlightLink(
+                                            `${option.returnOrigin} -> ${option.returnDestination}`,
+                                            option.returnFlightNumber,
+                                            option.returnDepartureTime,
+                                            option.returnOrigin,
+                                            option.returnDestination
+                                        )}</h4>
                                         <div class="detail-grid">
                                             <div class="detail-row">
                                                 <strong>Aerolinea</strong>
@@ -922,11 +841,43 @@ public class RestApi {
                     }
 
                     function renderEventLink(url) {
-                        if (!url) {
+                        if (!url || !isValidUrl(url)) {
                             return '<strong>No disponible</strong>';
                         }
 
                         return `<a href="${escapeAttribute(url)}" target="_blank" rel="noreferrer">Abrir evento</a>`;
+                    }
+
+                    function renderFlightLink(label, flightNumber, departureTime, origin, destination) {
+                         const url = buildGoogleFlightsUrl(origin, destination, departureTime);
+            
+                         if (!url) {
+                             return escapeHtml(label);
+                         }
+            
+                         return `<a href="${escapeAttribute(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
+                     }
+            
+                     function buildGoogleFlightsUrl(origin, destination, departureTime) {
+                         const date = toDate(departureTime);
+            
+                         if (!origin || !destination || !date) {
+                             return '';
+                         }
+            
+                         const formattedDate = date.toISOString().slice(0, 10);
+                         const query = encodeURIComponent(`${origin} to ${destination} ${formattedDate}`);
+            
+                         return `https://www.google.com/travel/flights?q=${query}`;
+                     }
+
+                    function isValidUrl(url) {
+                        try {
+                            const parsedUrl = new URL(url);
+                            return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+                        } catch (error) {
+                            return false;
+                        }
                     }
 
                     function buildDisplayEvents(events, recommendations) {
@@ -949,11 +900,10 @@ public class RestApi {
 
                         sortRecommendations(recommendations).forEach(recommendation => {
                             const displayKey = eventIdsByDisplayKey.get(recommendation.eventId);
-                            if (!displayKey || !groupedEvents.has(displayKey)) {
-                                return;
-                            }
 
-                            groupedEvents.get(displayKey).recommendations.push(recommendation);
+                            if (displayKey && groupedEvents.has(displayKey)) {
+                                groupedEvents.get(displayKey).recommendations.push(recommendation);
+                            }
                         });
 
                         return [...groupedEvents.values()]
@@ -982,6 +932,7 @@ public class RestApi {
 
                         sortRecommendations(recommendations).forEach(recommendation => {
                             const key = buildRecommendationKey(recommendation);
+
                             if (!merged.has(key)) {
                                 merged.set(key, recommendation);
                             }
@@ -1002,42 +953,23 @@ public class RestApi {
                         ].join('|');
                     }
 
-                    function groupRecommendationsByEvent(recommendations) {
-                        return recommendations.reduce((groups, recommendation) => {
-                            const key = recommendation.eventId || `${recommendation.eventName}-${recommendation.eventDate}`;
-                            groups[key] = groups[key] || [];
-                            groups[key].push(recommendation);
-                            return groups;
-                        }, {});
-                    }
-
                     function sortEvents(events) {
-                        return [...events].sort((left, right) => {
-                            const dateComparison = compareOptionalStrings(left.date, right.date);
-                            if (dateComparison !== 0) {
-                                return dateComparison;
-                            }
-
-                            const timeComparison = compareOptionalStrings(normalizeEventTime(left.startTime), normalizeEventTime(right.startTime));
-                            if (timeComparison !== 0) {
-                                return timeComparison;
-                            }
-
-                            return (left.name || '').localeCompare(right.name || '', 'es', { sensitivity: 'base' });
-                        });
+                        return [...events].sort((left, right) =>
+                            compareOptionalStrings(left.date, right.date)
+                            || compareOptionalStrings(normalizeEventTime(left.startTime), normalizeEventTime(right.startTime))
+                            || (left.name || '').localeCompare(right.name || '', 'es', { sensitivity: 'base' })
+                        );
                     }
 
                     function sortRecommendations(recommendations) {
                         return [...recommendations].sort((left, right) => {
-                            const eventComparison = compareOptionalStrings(left.eventDate, right.eventDate)
+                            const eventComparison =
+                                compareOptionalStrings(left.eventDate, right.eventDate)
                                 || compareOptionalStrings(normalizeEventTime(left.eventStartTime), normalizeEventTime(right.eventStartTime))
                                 || (left.eventName || '').localeCompare(right.eventName || '', 'es', { sensitivity: 'base' });
 
-                            if (eventComparison !== 0) {
-                                return eventComparison;
-                            }
-
-                            return compareDateTimes(right.outboundArrivalTime, left.outboundArrivalTime)
+                            return eventComparison
+                                || compareDateTimes(right.outboundArrivalTime, left.outboundArrivalTime)
                                 || compareDateTimes(left.returnDepartureTime, right.returnDepartureTime);
                         });
                     }
@@ -1049,18 +981,9 @@ public class RestApi {
                     }
 
                     function compareOptionalStrings(left, right) {
-                        if (left && right) {
-                            return left.localeCompare(right);
-                        }
-
-                        if (left) {
-                            return -1;
-                        }
-
-                        if (right) {
-                            return 1;
-                        }
-
+                        if (left && right) return left.localeCompare(right);
+                        if (left) return -1;
+                        if (right) return 1;
                         return 0;
                     }
 
@@ -1089,6 +1012,7 @@ public class RestApi {
 
                         for (const separator of separators) {
                             const separatorIndex = cleanedName.indexOf(separator);
+
                             if (separatorIndex > 0) {
                                 return cleanedName.slice(0, separatorIndex).trim();
                             }
@@ -1109,7 +1033,7 @@ public class RestApi {
                     }
 
                     function chooseRepresentativeEvent(events) {
-                        return [...events].sort((left, right) => compareRepresentativeEvents(left, right))[0];
+                        return [...events].sort(compareRepresentativeEvents)[0];
                     }
 
                     function compareRepresentativeEvents(left, right) {
@@ -1120,22 +1044,13 @@ public class RestApi {
 
                     function representativeScore(event) {
                         let score = 0;
+                        const name = normalizeText(event.name);
 
-                        if (!normalizeText(event.name).includes('vip packages')) {
-                            score += 4;
-                        }
-
-                        if (normalizeText(event.name) === normalizeText(extractArtistName(event.name))) {
-                            score += 4;
-                        }
-
-                        if (event.venue) {
-                            score += 2;
-                        }
-
-                        if (event.url) {
-                            score += 1;
-                        }
+                        if (!name.includes('vip packages')) score += 4;
+                        if (!name.includes('parking')) score += 4;
+                        if (name === normalizeText(extractArtistName(event.name))) score += 4;
+                        if (event.venue) score += 2;
+                        if (event.url) score += 1;
 
                         return score;
                     }
@@ -1159,12 +1074,10 @@ public class RestApi {
                     }
 
                     function choosePreferredStartTime(events) {
-                        const startTimes = events
+                        return events
                             .map(event => normalizeEventTime(event.startTime))
                             .filter(Boolean)
-                            .sort((left, right) => left.localeCompare(right));
-
-                        return startTimes[0] || '';
+                            .sort((left, right) => left.localeCompare(right))[0] || '';
                     }
 
                     function chooseLatestCapturedAt(events) {
@@ -1177,13 +1090,26 @@ public class RestApi {
                     }
 
                     function choosePreferredUrl(events) {
-                        const preferredEvent = chooseRepresentativeEvent(events);
-                        if (preferredEvent.url) {
-                            return preferredEvent.url;
-                        }
+                        const candidates = events
+                            .filter(event => event.url)
+                            .filter(event => !isParkingEvent(event))
+                            .sort((left, right) => urlScore(right) - urlScore(left));
 
-                        const alternativeEvent = events.find(event => event.url);
-                        return alternativeEvent ? alternativeEvent.url : '';
+                        return candidates.length > 0 ? candidates[0].url : '';
+                    }
+
+                    function urlScore(event) {
+                        const name = normalizeText(event.name);
+                        const url = normalizeText(event.url);
+                        let score = 0;
+
+                        if (url.includes('ticketmaster.es')) score += 8;
+                        if (url.includes('ticketmaster.com')) score += 3;
+                        if (!name.includes('vip packages')) score += 5;
+                        if (!name.includes('parking')) score += 4;
+                        if (normalizeText(event.name) === normalizeText(extractArtistName(event.name))) score += 2;
+
+                        return score;
                     }
 
                     function choosePreferredValue(values) {
@@ -1191,9 +1117,7 @@ public class RestApi {
                     }
 
                     function matchesEvent(event, options, query) {
-                        if (!query) {
-                            return true;
-                        }
+                        if (!query) return true;
 
                         const haystack = [
                             event.name,
@@ -1228,18 +1152,11 @@ public class RestApi {
                         const formattedDate = formatLongDate(date);
                         const start = formatClock(startTime);
                         const end = formatClock(endTime);
-
-                        if (!start && !end) {
-                            return formattedDate;
-                        }
-
                         return [formattedDate, [start, end].filter(Boolean).join(' - ')].filter(Boolean).join(' | ');
                     }
 
                     function formatEventDate(date, time) {
-                        const formattedDate = formatLongDate(date);
-                        const formattedTime = formatClock(time);
-                        return [formattedDate, formattedTime].filter(Boolean).join(' | ') || 'Fecha no disponible';
+                        return [formatLongDate(date), formatClock(time)].filter(Boolean).join(' | ') || 'Fecha no disponible';
                     }
 
                     function formatDateTime(value) {
@@ -1290,12 +1207,7 @@ public class RestApi {
 
                     function formatShortDay(value) {
                         const date = toDate(value);
-
-                        if (!date) {
-                            return '--';
-                        }
-
-                        return String(date.getDate()).padStart(2, '0');
+                        return date ? String(date.getDate()).padStart(2, '0') : '--';
                     }
 
                     function formatShortMonth(value) {
@@ -1344,13 +1256,8 @@ public class RestApi {
                     }
 
                     function toDate(value) {
-                        if (!value) {
-                            return null;
-                        }
-
-                        if (value instanceof Date && !Number.isNaN(value.getTime())) {
-                            return value;
-                        }
+                        if (!value) return null;
+                        if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
 
                         const trimmed = String(value).trim();
 
@@ -1416,6 +1323,19 @@ public class RestApi {
 
                     document.getElementById('searchInput').addEventListener('input', renderEvents);
                     document.getElementById('refreshButton').addEventListener('click', loadData);
+
+                    document.querySelectorAll('.filter-option').forEach(button => {
+                        button.addEventListener('click', () => {
+                            state.availabilityFilter = button.dataset.filter;
+
+                            document.querySelectorAll('.filter-option').forEach(option => {
+                                option.classList.toggle('active', option === button);
+                            });
+
+                            renderEvents();
+                        });
+                    });
+
                     loadData();
                 </script>
             </body>
