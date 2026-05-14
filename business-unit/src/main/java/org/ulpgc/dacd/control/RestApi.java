@@ -14,23 +14,37 @@ public class RestApi {
                 <title>Agenda vuelo + evento</title>
                 <style>
                     :root {
+                        --page: #f3f6fb;
                         --surface: #ffffff;
-                        --surface-soft: #f8fbfc;
-                        --border: #d8e3e6;
-                        --ink: #162126;
-                        --muted: #5f7078;
-                        --accent: #0f766e;
-                        --accent-strong: #115e59;
-                        --accent-soft: #dff3f1;
-                        --success: #166534;
+                        --surface-soft: #f8fafc;
+                        --border: #d8e0ea;
+                        --ink: #172033;
+                        --muted: #667085;
+                        --muted-soft: #98a2b3;
+
+                        --accent: #2563eb;
+                        --accent-strong: #1d4ed8;
+                        --accent-soft: #dbeafe;
+
+                        --event: #f97362;
+                        --event-strong: #c2410c;
+                        --event-soft: #fff1ed;
+
+                        --flight: #0891b2;
+                        --flight-strong: #0e7490;
+                        --flight-soft: #cffafe;
+
+                        --success: #15803d;
                         --success-soft: #dcfce7;
-                        --warning: #9a3412;
-                        --warning-soft: #ffedd5;
-                        --danger: #991b1b;
-                        --danger-soft: #fff7f7;
-                        --shadow: 0 24px 60px rgba(15, 118, 110, 0.08);
-                        --font-body: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-                        --font-heading: "Space Grotesk", "Segoe UI", sans-serif;
+                        --warning: #b45309;
+                        --warning-soft: #fef3c7;
+                        --danger: #b91c1c;
+                        --danger-soft: #fff1f2;
+
+                        --shadow: 0 18px 45px rgba(23, 32, 51, 0.08);
+                        --shadow-strong: 0 26px 70px rgba(23, 32, 51, 0.18);
+                        --font-body: "Inter", "Segoe UI", sans-serif;
+                        --font-heading: "Inter", "Segoe UI", sans-serif;
                     }
 
                     * { box-sizing: border-box; }
@@ -41,8 +55,9 @@ public class RestApi {
                         font-family: var(--font-body);
                         color: var(--ink);
                         background:
-                            radial-gradient(circle at top left, #edf9f7 0, transparent 32%),
-                            linear-gradient(180deg, #f7fbfb 0%, #eef3f4 100%);
+                            radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.12), transparent 30%),
+                            radial-gradient(circle at 92% 8%, rgba(249, 115, 98, 0.13), transparent 26%),
+                            linear-gradient(180deg, #f8fafc 0%, var(--page) 100%);
                     }
 
                     button, input { font: inherit; }
@@ -50,48 +65,52 @@ public class RestApi {
                     .page-shell {
                         width: min(1240px, calc(100% - 32px));
                         margin: 0 auto;
-                        padding: 28px 0 56px;
+                        padding: 24px 0 52px;
                     }
 
                     .hero {
                         display: grid;
-                        grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.95fr);
+                        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
                         gap: 24px;
-                        padding: 36px;
-                        border-radius: 28px;
-                        background: linear-gradient(135deg, #0f1720 0%, #143339 62%, #0f766e 100%);
+                        padding: 30px;
+                        border-radius: 22px;
+                        background:
+                            linear-gradient(135deg, rgba(37, 99, 235, 0.16), transparent 42%),
+                            linear-gradient(145deg, #111827 0%, #172033 58%, #20304d 100%);
                         color: #f8fafc;
-                        box-shadow: 0 30px 70px rgba(15, 23, 32, 0.2);
+                        box-shadow: var(--shadow-strong);
                     }
 
                     .hero-copy {
                         display: flex;
                         flex-direction: column;
                         justify-content: space-between;
-                        gap: 18px;
+                        gap: 22px;
                     }
 
                     .hero-eyebrow, .search-label, .filter-label, .eyebrow {
                         margin: 0;
                         font-size: 12px;
-                        font-weight: 700;
-                        letter-spacing: 0.12em;
+                        font-weight: 800;
+                        letter-spacing: 0.1em;
                         text-transform: uppercase;
                     }
 
-                    .hero-eyebrow, .search-label, .filter-label { color: #c8f7f0; }
+                    .hero-eyebrow, .search-label, .filter-label { color: #bfdbfe; }
                     .eyebrow { color: var(--accent); margin-bottom: 8px; }
 
                     .hero h1 {
+                        max-width: 820px;
                         margin: 0;
                         font-family: var(--font-heading);
-                        font-size: clamp(32px, 5vw, 48px);
-                        line-height: 1.05;
+                        font-size: clamp(31px, 4.5vw, 48px);
+                        line-height: 1.04;
+                        letter-spacing: 0;
                     }
 
                     .hero p {
                         margin: 0;
-                        max-width: 64ch;
+                        max-width: 66ch;
                         color: rgba(241, 245, 249, 0.82);
                         line-height: 1.6;
                     }
@@ -103,22 +122,23 @@ public class RestApi {
                     }
 
                     .highlight-pill {
-                        padding: 10px 14px;
-                        border: 1px solid rgba(184, 241, 234, 0.18);
+                        padding: 9px 13px;
+                        border: 1px solid rgba(255, 255, 255, 0.17);
                         border-radius: 999px;
                         background: rgba(255, 255, 255, 0.08);
-                        color: #d7fbf5;
+                        color: #e0f2fe;
                         font-size: 13px;
+                        font-weight: 700;
                     }
 
                     .hero-panel {
                         display: grid;
                         gap: 16px;
-                        padding: 24px;
-                        border: 1px solid rgba(226, 232, 240, 0.12);
-                        border-radius: 22px;
+                        padding: 22px;
+                        border: 1px solid rgba(226, 232, 240, 0.14);
+                        border-radius: 18px;
                         background: rgba(255, 255, 255, 0.1);
-                        backdrop-filter: blur(10px);
+                        backdrop-filter: blur(12px);
                     }
 
                     .hero-panel h2 {
@@ -131,15 +151,20 @@ public class RestApi {
 
                     .search-field input {
                         width: 100%;
-                        border: 1px solid rgba(226, 232, 240, 0.22);
-                        border-radius: 14px;
-                        padding: 14px 16px;
+                        border: 1px solid rgba(226, 232, 240, 0.25);
+                        border-radius: 12px;
+                        padding: 14px 15px;
                         background: rgba(248, 250, 252, 0.14);
                         color: #f8fafc;
                         outline: none;
                     }
 
-                    .search-field input::placeholder { color: rgba(226, 232, 240, 0.65); }
+                    .search-field input:focus {
+                        border-color: rgba(147, 197, 253, 0.85);
+                        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+                    }
+
+                    .search-field input::placeholder { color: rgba(226, 232, 240, 0.68); }
 
                     .filter-options {
                         display: grid;
@@ -151,17 +176,17 @@ public class RestApi {
                         border: 1px solid rgba(226, 232, 240, 0.22);
                         border-radius: 12px;
                         padding: 10px 12px;
-                        background: rgba(248, 250, 252, 0.12);
+                        background: rgba(248, 250, 252, 0.1);
                         color: rgba(248, 250, 252, 0.82);
                         font-size: 13px;
-                        font-weight: 700;
+                        font-weight: 800;
                         cursor: pointer;
                     }
 
                     .filter-option.active {
-                        border-color: rgba(184, 241, 234, 0.7);
-                        background: #f8fafc;
-                        color: #0f1720;
+                        border-color: #ffffff;
+                        background: #ffffff;
+                        color: #172033;
                     }
 
                     .panel-actions {
@@ -174,50 +199,67 @@ public class RestApi {
 
                     .panel-actions button {
                         border: 0;
-                        border-radius: 14px;
+                        border-radius: 12px;
                         padding: 12px 16px;
-                        background: #f8fafc;
-                        color: #0f1720;
-                        font-weight: 700;
+                        background: #ffffff;
+                        color: #172033;
+                        font-weight: 800;
                         cursor: pointer;
+                        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
                     }
+
+                    .panel-actions button:hover { background: #eff6ff; }
 
                     .results-label, .status-message {
                         font-size: 13px;
                         color: rgba(241, 245, 249, 0.78);
                     }
 
-                    .status-message.error { color: #fee2e2; }
+                    .status-message.error { color: #fecaca; }
 
                     .main-content {
                         display: grid;
-                        gap: 24px;
-                        margin-top: 24px;
+                        gap: 22px;
+                        margin-top: 22px;
                     }
 
                     .overview-grid {
                         display: grid;
                         grid-template-columns: repeat(4, minmax(0, 1fr));
-                        gap: 16px;
+                        gap: 14px;
                     }
 
                     .metric-card, .events-panel {
                         border: 1px solid var(--border);
-                        background: rgba(255, 255, 255, 0.94);
+                        background: rgba(255, 255, 255, 0.96);
                         box-shadow: var(--shadow);
                     }
 
                     .metric-card {
-                        padding: 20px;
-                        border-radius: 18px;
+                        position: relative;
+                        overflow: hidden;
+                        padding: 19px;
+                        border-radius: 16px;
                     }
+
+                    .metric-card::before {
+                        content: "";
+                        position: absolute;
+                        inset: 0 0 auto;
+                        height: 4px;
+                        background: var(--accent);
+                    }
+
+                    .metric-card:nth-child(2)::before { background: var(--success); }
+                    .metric-card:nth-child(3)::before { background: var(--flight); }
+                    .metric-card:nth-child(4)::before { background: var(--event); }
 
                     .metric-card span {
                         display: block;
                         margin-bottom: 10px;
                         font-size: 12px;
-                        font-weight: 700;
-                        letter-spacing: 0.1em;
+                        font-weight: 800;
+                        letter-spacing: 0.08em;
                         text-transform: uppercase;
                         color: var(--muted);
                     }
@@ -226,18 +268,19 @@ public class RestApi {
                         display: block;
                         font-family: var(--font-heading);
                         font-size: clamp(26px, 4vw, 34px);
+                        letter-spacing: -0.02em;
                     }
 
                     .metric-card small {
                         display: block;
-                        margin-top: 10px;
+                        margin-top: 9px;
                         color: var(--muted);
                         line-height: 1.5;
                     }
 
                     .events-panel {
-                        padding: 28px;
-                        border-radius: 28px;
+                        padding: 26px;
+                        border-radius: 22px;
                     }
 
                     .section-header {
@@ -246,17 +289,18 @@ public class RestApi {
                         gap: 16px;
                         align-items: end;
                         justify-content: space-between;
-                        margin-bottom: 24px;
+                        margin-bottom: 22px;
                     }
 
                     .section-header h2 {
                         margin: 0;
                         font-family: var(--font-heading);
-                        font-size: clamp(26px, 4vw, 34px);
+                        font-size: clamp(25px, 4vw, 34px);
+                        letter-spacing: -0.02em;
                     }
 
                     .section-copy {
-                        max-width: 55ch;
+                        max-width: 58ch;
                         margin: 0;
                         color: var(--muted);
                         line-height: 1.6;
@@ -264,18 +308,25 @@ public class RestApi {
 
                     .events-list {
                         display: grid;
-                        gap: 14px;
+                        gap: 13px;
                     }
 
                     .event-card {
                         border: 1px solid var(--border);
-                        border-radius: 22px;
+                        border-radius: 16px;
                         background: var(--surface);
                         overflow: hidden;
+                        transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+                    }
+
+                    .event-card:hover {
+                        transform: translateY(-1px);
+                        border-color: #b8c7d9;
                     }
 
                     .event-card[open] {
-                        box-shadow: 0 20px 40px rgba(15, 23, 32, 0.08);
+                        border-color: rgba(37, 99, 235, 0.38);
+                        box-shadow: 0 18px 45px rgba(23, 32, 51, 0.1);
                     }
 
                     .event-summary {
@@ -283,7 +334,7 @@ public class RestApi {
                         align-items: center;
                         justify-content: space-between;
                         gap: 18px;
-                        padding: 22px 24px;
+                        padding: 20px 22px;
                         cursor: pointer;
                         list-style: none;
                     }
@@ -293,31 +344,32 @@ public class RestApi {
                     .event-summary-main {
                         display: flex;
                         align-items: center;
-                        gap: 18px;
+                        gap: 16px;
                         min-width: 0;
                     }
 
                     .date-badge {
                         display: grid;
                         place-items: center;
-                        min-width: 86px;
-                        padding: 14px 12px;
-                        border-radius: 16px;
-                        background: #edf5f6;
-                        color: var(--accent-strong);
+                        min-width: 76px;
+                        padding: 13px 11px;
+                        border-radius: 14px;
+                        background: var(--event-soft);
+                        color: var(--event-strong);
                         text-align: center;
                     }
 
                     .date-badge strong {
                         font-family: var(--font-heading);
-                        font-size: 24px;
+                        font-size: 25px;
                         line-height: 1;
+                        letter-spacing: -0.03em;
                     }
 
                     .date-badge span {
                         margin-top: 4px;
                         font-size: 12px;
-                        font-weight: 700;
+                        font-weight: 900;
                         text-transform: uppercase;
                     }
 
@@ -325,6 +377,7 @@ public class RestApi {
                         margin: 0 0 6px;
                         font-size: 20px;
                         line-height: 1.25;
+                        letter-spacing: -0.01em;
                     }
 
                     .event-copy p {
@@ -336,7 +389,7 @@ public class RestApi {
                     .event-summary-side {
                         display: flex;
                         flex-wrap: wrap;
-                        gap: 10px;
+                        gap: 9px;
                         justify-content: flex-end;
                     }
 
@@ -346,13 +399,25 @@ public class RestApi {
                         justify-content: center;
                         border-radius: 999px;
                         font-size: 13px;
-                        font-weight: 700;
+                        font-weight: 800;
+                        white-space: nowrap;
                     }
 
-                    .availability-chip, .summary-action { padding: 10px 14px; }
+                    .availability-chip, .summary-action { padding: 9px 13px; }
                     .availability-chip.available { background: var(--success-soft); color: var(--success); }
                     .availability-chip.unavailable { background: var(--warning-soft); color: var(--warning); }
-                    .summary-action { border: 1px solid var(--border); background: #f8fafc; color: var(--ink); }
+
+                    .summary-action {
+                        border: 1px solid var(--border);
+                        background: #f8fafc;
+                        color: var(--ink);
+                    }
+
+                    .summary-action::after {
+                        content: "⌄";
+                        margin-left: 8px;
+                        font-size: 14px;
+                    }
 
                     .event-card[open] .summary-action {
                         border-color: transparent;
@@ -360,9 +425,11 @@ public class RestApi {
                         color: var(--accent-strong);
                     }
 
+                    .event-card[open] .summary-action::after { content: "⌃"; }
+
                     .event-body {
-                        padding: 0 24px 24px;
-                        border-top: 1px solid #edf2f4;
+                        padding: 0 22px 22px;
+                        border-top: 1px solid #edf2f7;
                     }
 
                     .event-meta-grid {
@@ -370,7 +437,7 @@ public class RestApi {
                         grid-template-columns: repeat(4, minmax(0, 1fr));
                         gap: 12px;
                         padding-top: 18px;
-                        margin-bottom: 18px;
+                        margin-bottom: 16px;
                     }
 
                     .meta-card, .flight-card, .option-card {
@@ -379,16 +446,16 @@ public class RestApi {
                     }
 
                     .meta-card {
-                        padding: 14px 16px;
-                        border-radius: 16px;
+                        padding: 14px 15px;
+                        border-radius: 14px;
                     }
 
                     .meta-card span, .flight-card span {
                         display: block;
                         margin-bottom: 6px;
                         font-size: 11px;
-                        font-weight: 700;
-                        letter-spacing: 0.1em;
+                        font-weight: 900;
+                        letter-spacing: 0.08em;
                         text-transform: uppercase;
                         color: var(--muted);
                     }
@@ -407,9 +474,10 @@ public class RestApi {
                     }
 
                     .option-card {
-                        padding: 18px;
-                        border-radius: 18px;
-                        background: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
+                        padding: 17px;
+                        border-radius: 16px;
+                        background: #ffffff;
+                        box-shadow: 0 10px 24px rgba(23, 32, 51, 0.05);
                     }
 
                     .option-header {
@@ -426,7 +494,7 @@ public class RestApi {
                         background: var(--accent-soft);
                         color: var(--accent-strong);
                         font-size: 12px;
-                        letter-spacing: 0.08em;
+                        letter-spacing: 0.06em;
                         text-transform: uppercase;
                     }
 
@@ -442,15 +510,28 @@ public class RestApi {
                     }
 
                     .flight-card {
+                        position: relative;
                         padding: 16px;
-                        border-radius: 16px;
+                        border-radius: 14px;
                         background: #ffffff;
+                        overflow: hidden;
                     }
+
+                    .flight-card::before {
+                        content: "";
+                        position: absolute;
+                        inset: 0 auto 0 0;
+                        width: 4px;
+                        background: var(--flight);
+                    }
+
+                    .flight-card.return-flight::before { background: var(--event); }
 
                     .flight-card h4 {
                         margin: 0 0 12px;
                         font-family: var(--font-heading);
                         font-size: 22px;
+                        letter-spacing: -0.02em;
                     }
 
                     .flight-card h4 a {
@@ -458,9 +539,7 @@ public class RestApi {
                         text-decoration: none;
                     }
 
-                    .flight-card h4 a:hover {
-                        text-decoration: underline;
-                    }
+                    .flight-card h4 a:hover { text-decoration: underline; }
 
                     .detail-grid {
                         display: grid;
@@ -472,7 +551,7 @@ public class RestApi {
                         justify-content: space-between;
                         gap: 12px;
                         padding-top: 10px;
-                        border-top: 1px solid #edf2f4;
+                        border-top: 1px solid #edf2f7;
                     }
 
                     .detail-row:first-child {
@@ -487,14 +566,15 @@ public class RestApi {
 
                     .detail-row span {
                         font-size: 14px;
-                        font-weight: 600;
+                        font-weight: 650;
+                        text-align: right;
                     }
 
                     .empty-state {
-                        padding: 28px;
-                        border: 1px dashed #c3d3d7;
-                        border-radius: 22px;
-                        background: #fbfdfe;
+                        padding: 26px;
+                        border: 1px dashed #c3d3df;
+                        border-radius: 16px;
+                        background: #fbfdff;
                         color: var(--muted);
                         line-height: 1.6;
                     }
@@ -515,12 +595,13 @@ public class RestApi {
 
                     @media (max-width: 760px) {
                         .page-shell { width: min(100% - 20px, 1240px); padding-top: 12px; }
-                        .hero, .events-panel { padding: 22px; }
+                        .hero, .events-panel { padding: 20px; border-radius: 18px; }
                         .overview-grid, .event-meta-grid, .flight-columns, .filter-options { grid-template-columns: 1fr; }
                         .event-summary, .event-summary-main { align-items: flex-start; }
                         .event-summary { flex-direction: column; }
                         .event-summary-side { justify-content: flex-start; }
                         .detail-row { flex-direction: column; }
+                        .detail-row span { text-align: left; }
                     }
                 </style>
             </head>
@@ -529,30 +610,30 @@ public class RestApi {
                     <header class="hero">
                         <div class="hero-copy">
                             <div>
-                                <p class="hero-eyebrow">Explorador de agenda</p>
-                                <h1>Todos los eventos y sus mejores opciones de vuelo en una sola vista.</h1>
+                                <p class="hero-eyebrow">LPA → Madrid / Barcelona</p>
+                                <h1>Encuentra eventos con vuelos compatibles desde Gran Canaria.</h1>
                             </div>
                             <p>
-                                La interfaz trabaja sobre el datamart completo de eventos y despliega los vuelos
-                                cuando abres el evento que te interesa.
+                                Consulta la agenda disponible y compara las mejores combinaciones de ida y vuelta
+                                para cada evento.
                             </p>
                             <div class="hero-highlights">
-                                <span class="highlight-pill">Eventos completos</span>
-                                <span class="highlight-pill">Opciones por evento</span>
-                                <span class="highlight-pill">Consulta rapida</span>
+                                <span class="highlight-pill">Eventos Ticketmaster</span>
+                                <span class="highlight-pill">Vuelos Aena</span>
+                                <span class="highlight-pill">Recomendaciones automáticas</span>
                             </div>
                         </div>
 
                         <aside class="hero-panel">
                             <div>
-                                <h2>Busqueda y estado</h2>
-                                <p>Filtra por evento, ciudad, recinto, aeropuerto, aerolinea o numero de vuelo.</p>
+                                <h2>Búsqueda y estado</h2>
+                                <p>Filtra por evento, ciudad, recinto, aeropuerto, aerolínea o número de vuelo.</p>
                             </div>
 
                             <label class="search-field" for="searchInput">
                                 <span class="search-label">Buscar</span>
                                 <input id="searchInput" type="search"
-                                       placeholder="Ej. Madrid, Bad Bunny, LPA, Iberia">
+                                       placeholder="Ej. Madrid, concierto, LPA, Iberia">
                             </label>
 
                             <div class="availability-filter">
@@ -583,7 +664,7 @@ public class RestApi {
                             <article class="metric-card">
                                 <span>Con opciones</span>
                                 <strong id="coveredEventsCount">-</strong>
-                                <small>Eventos con al menos una combinacion de vuelos.</small>
+                                <small>Eventos con al menos una combinación de vuelos.</small>
                             </article>
                             <article class="metric-card">
                                 <span>Combinaciones</span>
@@ -591,7 +672,7 @@ public class RestApi {
                                 <small>Alternativas de ida y vuelta listas para revisar.</small>
                             </article>
                             <article class="metric-card">
-                                <span>Ultima captura</span>
+                                <span>Última captura</span>
                                 <strong id="lastUpdated">-</strong>
                                 <small id="flightsSummary">-</small>
                             </article>
@@ -604,7 +685,7 @@ public class RestApi {
                                     <h2>Eventos disponibles</h2>
                                 </div>
                                 <p class="section-copy">
-                                    Pulsa sobre cualquier evento para desplegar sus opciones de vuelo. Los eventos sin
+                                    Abre cualquier evento para revisar sus opciones de vuelo. Los eventos sin
                                     combinaciones siguen visibles para reflejar toda la agenda cargada.
                                 </p>
                             </div>
@@ -639,7 +720,7 @@ public class RestApi {
                             ]);
 
                             if (!eventsResponse.ok || !flightsResponse.ok || !recommendationsResponse.ok) {
-                                throw new Error('La API no devolvio una respuesta valida.');
+                                throw new Error('La API no devolvió una respuesta válida.');
                             }
 
                             state.events = sortEvents(await eventsResponse.json());
@@ -713,7 +794,7 @@ public class RestApi {
                     function renderEventCard(event, options) {
                         const availabilityClass = options.length > 0 ? 'available' : 'unavailable';
                         const availabilityLabel = options.length > 0
-                            ? `${options.length} ${options.length === 1 ? 'opcion disponible' : 'opciones disponibles'}`
+                            ? `${options.length} ${options.length === 1 ? 'opción disponible' : 'opciones disponibles'}`
                             : 'Sin vuelos compatibles';
 
                         return `
@@ -764,7 +845,7 @@ public class RestApi {
                         if (options.length === 0) {
                             return `
                                 <div class="empty-state">
-                                    Este evento esta en la agenda, pero aun no tiene combinaciones de vuelo compatibles.
+                                    Este evento está en la agenda, pero aún no tiene combinaciones de vuelo compatibles.
                                 </div>
                             `;
                         }
@@ -780,15 +861,15 @@ public class RestApi {
                         return `
                             <article class="option-card">
                                 <div class="option-header">
-                                    <span class="option-rank">Opcion ${index + 1}</span>
+                                    <span class="option-rank">Opción ${index + 1}</span>
                                     <span class="captured-label">Generada ${escapeHtml(formatCapturedAt(option.capturedAt))}</span>
                                 </div>
 
                                 <div class="flight-columns">
-                                    <section class="flight-card">
+                                    <section class="flight-card outbound-flight">
                                         <span>Vuelo de ida</span>
                                         <h4>${renderFlightLink(
-                                            `${option.outboundOrigin} -> ${option.outboundDestination}`,
+                                            `${option.outboundOrigin} → ${option.outboundDestination}`,
                                             option.outboundFlightNumber,
                                             option.outboundDepartureTime,
                                             option.outboundOrigin,
@@ -797,7 +878,7 @@ public class RestApi {
             
                                         <div class="detail-grid">
                                             <div class="detail-row">
-                                                <strong>Aerolinea</strong>
+                                                <strong>Aerolínea</strong>
                                                 <span>${escapeHtml(buildAirlineLabel(option.outboundAirline, option.outboundFlightNumber))}</span>
                                             </div>
                                             <div class="detail-row">
@@ -811,10 +892,10 @@ public class RestApi {
                                         </div>
                                     </section>
 
-                                    <section class="flight-card">
+                                    <section class="flight-card return-flight">
                                         <span>Vuelo de vuelta</span>
                                         <h4>${renderFlightLink(
-                                            `${option.returnOrigin} -> ${option.returnDestination}`,
+                                            `${option.returnOrigin} → ${option.returnDestination}`,
                                             option.returnFlightNumber,
                                             option.returnDepartureTime,
                                             option.returnOrigin,
@@ -822,7 +903,7 @@ public class RestApi {
                                         )}</h4>
                                         <div class="detail-grid">
                                             <div class="detail-row">
-                                                <strong>Aerolinea</strong>
+                                                <strong>Aerolínea</strong>
                                                 <span>${escapeHtml(buildAirlineLabel(option.returnAirline, option.returnFlightNumber))}</span>
                                             </div>
                                             <div class="detail-row">
@@ -1141,7 +1222,7 @@ public class RestApi {
                     }
 
                     function buildEventSubtitle(event) {
-                        return [event.city, event.venue].filter(Boolean).join(' | ') || 'Ubicacion no disponible';
+                        return [event.city, event.venue].filter(Boolean).join(' · ') || 'Ubicación no disponible';
                     }
 
                     function buildAirlineLabel(airline, flightNumber) {
@@ -1152,11 +1233,11 @@ public class RestApi {
                         const formattedDate = formatLongDate(date);
                         const start = formatClock(startTime);
                         const end = formatClock(endTime);
-                        return [formattedDate, [start, end].filter(Boolean).join(' - ')].filter(Boolean).join(' | ');
+                        return [formattedDate, [start, end].filter(Boolean).join(' - ')].filter(Boolean).join(' · ');
                     }
 
                     function formatEventDate(date, time) {
-                        return [formatLongDate(date), formatClock(time)].filter(Boolean).join(' | ') || 'Fecha no disponible';
+                        return [formatLongDate(date), formatClock(time)].filter(Boolean).join(' · ') || 'Fecha no disponible';
                     }
 
                     function formatDateTime(value) {
@@ -1306,7 +1387,7 @@ public class RestApi {
                         document.getElementById('recommendationsCount').textContent = '-';
                         document.getElementById('lastUpdated').textContent = '-';
                         document.getElementById('flightsSummary').textContent = 'No se pudieron recuperar los vuelos.';
-                        document.getElementById('resultsLabel').textContent = 'Sin conexion con la API';
+                        document.getElementById('resultsLabel').textContent = 'Sin conexión con la API';
                         document.getElementById('eventsContainer').innerHTML = `
                             <div class="empty-state error-state">
                                 No se pudieron cargar los datos desde la API REST. Revisa la consola del servicio
