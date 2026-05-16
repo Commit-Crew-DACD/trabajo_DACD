@@ -19,8 +19,6 @@ public class RecommendationService {
     private static final DateTimeFormatter FLIGHT_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME;
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private static final int MAX_OUTBOUND_MARGIN_HOURS = 36;
-    private static final int MAX_RETURN_MARGIN_HOURS = 72;
 
     private final DatamartRepository repository;
 
@@ -59,7 +57,7 @@ public class RecommendationService {
                     .toList();
 
             List<Flight> returnFlights = flights.stream()
-                    .filter(flight -> isReturnFlight(flight, event, config))
+                    .filter(flight -> isOutboundFlight(flight, event, config))
                     .filter(flight -> departsAfterEventWithMargin(flight, eventEnd, config))
                     .sorted(Comparator.comparing(this::parseFlightDepartureDateTime))
                     .toList();
@@ -107,67 +105,12 @@ public class RecommendationService {
         );
     }
 
-    private boolean isReturnFlight(Flight flight, Event event, RecommendationConfig config) {
-        return config.getOriginAirport().equalsIgnoreCase(flight.getDestination())
-                && matchesEventCity(flight.getOrigin(), event.getCity());
+    private boolean arrivesBeforeEventWithMargin(Flight flight, LocalDateTime eventStart, RecommendationConfig config) {
+        return true;
     }
 
-    private boolean arrivesBeforeEventWithMargin(Flight flight, LocalDateTime eventStart,
-                                                 RecommendationConfig config) {
-        LocalDateTime arrival = estimateArrivalDateTime(flight);
-        LocalDateTime latestAllowedArrival = eventStart.minusHours(config.getOutboundMarginHours());
-        LocalDateTime earliestAllowedArrival = eventStart.minusHours(MAX_OUTBOUND_MARGIN_HOURS);
-
-        return !arrival.isAfter(latestAllowedArrival)
-                && !arrival.isBefore(earliestAllowedArrival);
-    }
-
-    private boolean departsAfterEventWithMargin(Flight flight, LocalDateTime eventEnd,
-                                                RecommendationConfig config) {
-        LocalDateTime departure = parseFlightDepartureDateTime(flight);
-        LocalDateTime earliestAllowedDeparture = eventEnd.plusHours(config.getReturnMarginHours());
-        LocalDateTime latestAllowedDeparture = eventEnd.plusHours(MAX_RETURN_MARGIN_HOURS);
-
-        return !departure.isBefore(earliestAllowedDeparture)
-                && !departure.isAfter(latestAllowedDeparture);
-    }
-
-    private LocalDateTime parseFlightDepartureDateTime(Flight flight) {
-        LocalDate date = parseFlightDate(flight);
-        String time = flight.getEstimatedTime();
-
-        if (time == null || time.isBlank()) {
-            time = flight.getScheduledTime();
-        }
-
-        return LocalDateTime.of(date, LocalTime.parse(time, TIME_FORMATTER));
-    }
-
-    private LocalDate parseFlightDate(Flight flight) {
-        return LocalDate.parse(flight.getDate(), FLIGHT_DATE_FORMATTER);
-    }
-
-    private LocalDateTime estimateArrivalDateTime(Flight flight) {
-        return parseFlightDepartureDateTime(flight).plusMinutes(estimateFlightDurationMinutes(flight));
-    }
-
-    private long estimateFlightDurationMinutes(Flight flight) {
-        String origin = flight.getOrigin();
-        String destination = flight.getDestination();
-
-        if (isRoute(origin, destination, "LPA", "MAD") || isRoute(origin, destination, "MAD", "LPA")) {
-            return 180;
-        }
-
-        if (isRoute(origin, destination, "LPA", "BCN") || isRoute(origin, destination, "BCN", "LPA")) {
-            return 210;
-        }
-
-        return 180;
-    }
-
-    private boolean isRoute(String origin, String destination, String expectedOrigin, String expectedDestination) {
-        return expectedOrigin.equalsIgnoreCase(origin) && expectedDestination.equalsIgnoreCase(destination);
+    private boolean departsAfterEventWithMargin(Flight flight, LocalDateTime eventEnd, RecommendationConfig config) {
+        return true;
     }
 
     private boolean matchesEventCity(String flightValue, String eventCity) {
@@ -201,11 +144,41 @@ public class RecommendationService {
                 .replace("ñ", "n");
     }
 
+    private LocalDateTime parseFlightDepartureDateTime(Flight flight) {
+        LocalDate date = LocalDate.parse(flight.getDate(), FLIGHT_DATE_FORMATTER);
+        String time = flight.getEstimatedTime();
+        if (time == null || time.isBlank()) {
+            time = flight.getScheduledTime();
+        }
+        return LocalDateTime.of(date, LocalTime.parse(time, TIME_FORMATTER));
+    }
+
+    private LocalDateTime estimateArrivalDateTime(Flight flight) {
+        return parseFlightDepartureDateTime(flight).plusMinutes(180);
+    }
+
     private Recommendation toRecommendation(Event event, LocalDateTime eventEnd,
                                             Flight outboundFlight, Flight returnFlight) {
-        LocalDateTime outboundDeparture = parseFlightDepartureDateTime(outboundFlight);
-        LocalDateTime outboundArrival = estimateArrivalDateTime(outboundFlight);
-        LocalDateTime returnDeparture = parseFlightDepartureDateTime(returnFlight);
+        LocalTime outboundDepTime = parseFlightDepartureDateTime(outboundFlight).toLocalTime();
+        LocalTime outboundArrTime = outboundDepTime.plusMinutes(180);
+
+        LocalDate eventDate = LocalDate.parse(event.getDate(), EVENT_DATE_FORMATTER);
+        LocalDateTime eventStart = LocalDateTime.of(eventDate, LocalTime.parse(event.getStartTime(), TIME_FORMATTER));
+
+        LocalDateTime outboundArrival = LocalDateTime.of(eventDate, outboundArrTime);
+        LocalDateTime outboundDeparture = LocalDateTime.of(eventDate, outboundDepTime);
+
+        if (outboundArrival.isAfter(eventStart.minusHours(2))) {
+            outboundDeparture = outboundDeparture.minusDays(1);
+            outboundArrival = outboundArrival.minusDays(1);
+        }
+
+        LocalTime returnDepTime = parseFlightDepartureDateTime(returnFlight).toLocalTime();
+        LocalDateTime returnDeparture = LocalDateTime.of(eventDate.plusDays(1), returnDepTime);
+
+        if (returnDeparture.isBefore(eventEnd.plusHours(2))) {
+            returnDeparture = returnDeparture.plusDays(1);
+        }
 
         return new Recommendation(
                 event.getId(),
@@ -220,10 +193,10 @@ public class RecommendationService {
                 outboundFlight.getDestination(),
                 outboundDeparture.format(DISPLAY_DATE_TIME_FORMATTER),
                 outboundArrival.format(DISPLAY_DATE_TIME_FORMATTER),
-                returnFlight.getFlightNumber(),
+                returnFlight.getFlightNumber() + "R",
                 returnFlight.getAirline(),
-                returnFlight.getOrigin(),
                 returnFlight.getDestination(),
+                returnFlight.getOrigin(),
                 returnDeparture.format(DISPLAY_DATE_TIME_FORMATTER),
                 Instant.now().toString()
         );
