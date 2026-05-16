@@ -25,7 +25,7 @@ public class TicketmasterService implements EventProvider {
             throw new IllegalStateException("API Key no encontrada. Configura TICKETMASTER_KEY en Environment Variables.");
         }
 
-        String url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=" + apiKey + "&city=" + city;
+        String url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=" + apiKey + "&city=" + city + "&size=100";
         Request request = new Request.Builder().url(url).build();
 
         try (Response response = client.newCall(request).execute()) {

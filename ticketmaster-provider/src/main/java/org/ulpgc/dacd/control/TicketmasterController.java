@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 public class TicketmasterController {
     private final EventProvider eventProvider;
     private final JmsPublisher publisher;
@@ -47,7 +46,7 @@ public class TicketmasterController {
     private String toJson(Event event) {
         JsonObject obj = gson.toJsonTree(event).getAsJsonObject();
         obj.addProperty("ts", Instant.now().toString());
-        obj.addProperty("ss", "ticketmaster-api");
+        obj.addProperty("ss", "ticketmaster-provider");
         return obj.toString();
     }
 }
