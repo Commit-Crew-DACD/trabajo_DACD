@@ -28,6 +28,12 @@ public class EventStoreWriter {
     public void write(String topic, String json) {
         try {
             JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
+
+            if (!obj.has("ss") || !obj.has("ts")) {
+                System.err.println("Error: El JSON no contiene las propiedades obligatorias ss o ts.");
+                return;
+            }
+
             String ss = obj.get("ss").getAsString();
             String ts = obj.get("ts").getAsString();
             String date = DATE_FORMATTER.format(Instant.parse(ts));
@@ -42,7 +48,9 @@ public class EventStoreWriter {
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.err.println("Error escribiendo evento: " + e.getMessage());
+            System.err.println("Error de E/S escribiendo evento: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error inesperado al procesar el mensaje JSON: " + e.getMessage());
         }
     }
 }
