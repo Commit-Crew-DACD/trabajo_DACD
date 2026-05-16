@@ -13,9 +13,17 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class EventStoreWriter {
-    private static final String BASE_PATH = "eventstore";
+    private final String basePath;
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyyMMdd").withZone(ZoneOffset.UTC);
+
+    public EventStoreWriter() {
+        this.basePath = "eventstore";
+    }
+
+    public EventStoreWriter(String basePath) {
+        this.basePath = basePath;
+    }
 
     public void write(String topic, String json) {
         try {
@@ -24,7 +32,7 @@ public class EventStoreWriter {
             String ts = obj.get("ts").getAsString();
             String date = DATE_FORMATTER.format(Instant.parse(ts));
 
-            Path dir = Paths.get(BASE_PATH, topic, ss);
+            Path dir = Paths.get(basePath, topic, ss);
             Files.createDirectories(dir);
 
             Path file = dir.resolve(date + ".events");

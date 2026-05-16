@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,11 @@ public class FlightService implements FlightProvider {
     @Override
     public List<Flight> getFlights() throws IOException {
         List<Flight> flights = new ArrayList<>();
-        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=" + origin + "&flightType=S&limit=100&dosDias=si";
+        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos"
+                + "&airport=" + origin
+                + "&flightType=S"
+                + "&limit=500"
+                + "&dosDias=si";
 
         Request request = new Request.Builder()
                 .url(url)
@@ -33,30 +38,44 @@ public class FlightService implements FlightProvider {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) return flights;
+            if (!response.isSuccessful() || response.body() == null) {
+                return flights;
+            }
+
             JsonArray array = JsonParser.parseString(response.body().string()).getAsJsonArray();
 
             for (int i = 0; i < array.size(); i++) {
                 JsonObject f = array.get(i).getAsJsonObject();
-                String destination = f.get("iataOtro").getAsString();
+                String destination = getString(f, "iataOtro");
 
-                if (destinations.contains(destination)) {
-                    flights.add(new Flight(
-                            f.get("numVuelo").getAsString(),
-                            f.get("iataAena").getAsString(),
-                            destination,
-                            f.get("ciudadIataOtro").getAsString(),
-                            f.get("fecha").getAsString(),
-                            f.get("horaProgramada").getAsString(),
-                            f.get("horaEstimada").getAsString(),
-                            f.get("estado").getAsString(),
-                            f.get("nombreCompania").getAsString(),
-                            f.get("terminal").getAsString(),
-                            "S"
-                    ));
+                if (!destinations.contains(destination)) {
+                    continue;
                 }
+
+                flights.add(new Flight(
+                        getString(f, "numVuelo"),
+                        getString(f, "iataAena"),
+                        destination,
+                        getString(f, "ciudadIataOtro"),
+                        getString(f, "fecha"),
+                        getString(f, "horaProgramada"),
+                        getString(f, "horaEstimada"),
+                        getString(f, "estado"),
+                        getString(f, "nombreCompania"),
+                        getString(f, "terminal"),
+                        "S"
+                ));
             }
         }
+
         return flights;
+    }
+
+    private String getString(JsonObject object, String key) {
+        if (!object.has(key) || object.get(key).isJsonNull()) {
+            return "";
+        }
+
+        return object.get(key).getAsString();
     }
 }

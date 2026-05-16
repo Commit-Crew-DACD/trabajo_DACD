@@ -26,14 +26,11 @@ public class JmsPublisher {
     }
 
     public void publish(String json) throws JMSException {
-        if (session == null) return;
         TextMessage message = session.createTextMessage(json);
         producer.send(message);
     }
 
     public void close() throws JMSException {
-        if (producer != null) producer.close();
-        if (session != null) session.close();
         if (connection != null) connection.close();
     }
 }
