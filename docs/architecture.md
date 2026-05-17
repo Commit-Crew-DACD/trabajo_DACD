@@ -1,12 +1,12 @@
-# Documentación de Arquitectura y Diagramas de Clases
+# Documentación de Arquitectura y Diseño Técnico
 
-Este documento detalla la arquitectura de software del sistema, enfocándose especialmente en el módulo central `business-unit`. La aplicación sigue un enfoque arquitectónico guiado por eventos (EDA - Event-Driven Architecture) totalmente desacoplado mediante un broker de mensajería (ActiveMQ), resistencia centralizada en un Datamart relacional (SQLite) y exposición dinámica de datos a través de una interfaz web integrada por una API REST (Javalin).
+Este documento describe la especificación técnica de la arquitectura de software implementada, centrada en el módulo de procesamiento `business-unit`. El sistema adopta un enfoque orientado a eventos (EDA) acoplado a través de un broker de mensajería asíncrona, un Datamart relacional centralizado y un servidor web integrado para la exposición de servicios.
 
 ---
 
-## 1. Arquitectura General y Flujo de Control (`business-unit`)
+## 1. Arquitectura de Control y Flujo del Sistema (`business-unit`)
 
-Este diagrama representa el núcleo de control y la orquestación de la Unidad de Negocio. Muestra cómo coordinan sus acciones la interfaz de la API web (`RestApi`), el cargador por lotes del histórico (`EventStoreLoader`) y el consumidor asíncrono en tiempo real (`JmsEventConsumer`), delegando el almacenamiento y la consulta de la información en la Fachada única del repositorio central.
+El siguiente esquema representa la estructura de hilos y la lógica de control del componente principal. Ilustra la interacción simultánea entre la API REST (`RestApi`), el módulo de lectura histórica de archivos (`EventStoreLoader`) y el receptor de eventos de mensajería (`JmsEventConsumer`), interactuando de forma unificada sobre la fachada del repositorio.
 
 ```mermaid
 classDiagram
@@ -78,15 +78,15 @@ classDiagram
     RestApi --> RecommendationService : fuerza recalculación
 ```
 
-### Argumentos clave para la defensa ante el tribunal:
-* **Desacoplamiento asíncrono:** El componente `JmsEventConsumer` reacciona de manera pura a los tópicos del broker sin conocer el origen de los datos. Los capturadores externos (`flight-provider` y `ticketmaster-provider`) son completamente inmutables e independientes del destino.
-* **Separación de Conceptos:** La clase `EventMessageParser` aísla de forma exclusiva la lógica de deserialización e interpretación de los payloads JSON, evitando que las clases de negocio o persistencia tengan que lidiar con dependencias directas de librerías de conversión.
+### Especificaciones de Diseño:
+* **Desacoplamiento de Red:** Los productores externos (`flight-provider` y `ticketmaster-provider`) interactúan únicamente con el Broker de ActiveMQ, garantizando que el origen de datos y el motor de procesamiento sean independientes.
+* **Procesamiento de Payloads:** La lógica de análisis e interpretación de cadenas JSON se centraliza en `EventMessageParser`, encapsulando los esquemas externos fuera de las clases de almacenamiento.
 
 ---
 
 ## 2. Capa de Persistencia (Patrón Repository y Fachada Datamart)
 
-Este diagrama detalla la arquitectura del almacenamiento relacional de SQLite dentro de la Unidad de Negocio. Implementa el patrón estructural **Repository** para subdividir las tareas SQL por tabla, agrupándolas formalmente bajo una estructura de **Fachada** (`DatamartRepository`) para simplificar su consumo externo.
+Este diagrama detalla el diseño estructural del almacenamiento local sobre SQLite. Se organiza mediante la segregación de interfaces por tabla (Patrón Repository) y se consolida bajo un único punto de acceso unificado (Patrón Facade).
 
 ```mermaid
 classDiagram
@@ -142,15 +142,15 @@ classDiagram
     ConfigRepository --> DatabaseManager : solicita Connection
 ```
 
-### Argumentos clave para la defensa ante el tribunal:
-* **Patrón Fachada (Facade):** Ningún elemento de control de la aplicación (`RestApi` o `RecommendationService`) tiene visibilidad directa de las sentencias SQL ni de los repositorios atómicos de las tablas. Esto permite sustituir el motor de base de datos en el futuro modificando únicamente este paquete cerrado.
-* **Ciclo de vida centralizado:** La clase `DatabaseManager` asume de forma única la responsabilidad del mapeo inicial DDL (`CREATE TABLE IF NOT EXISTS`) y de proveer conexiones limpias a través de JDBC mediante bloques robustos de control de recursos.
+### Especificaciones de Persistencia:
+* **Abstracción del Motor:** El uso de `DatamartRepository` como fachada oculta la implementación interna de JDBC y las sentencias SQL de las capas superiores de lógica de negocio (`RestApi` y `RecommendationService`).
+* **Ciclo de Vida de Conexiones:** `DatabaseManager` asume de forma única la apertura de flujos y la verificación/inicialización de las tablas de datos (`DDL`) durante el ciclo de arranque.
 
 ---
 
-## 3. Capa de Modelo (Entidades Inmutables / POJOs)
+## 3. Capa de Modelo (Entidades Inmutables)
 
-Representa los Objetos de Transferencia de Datos (`Plain Old Java Objects`) que fluyen verticalmente a través de todas las capas del sistema. Se ha priorizado el principio de **Inmutabilidad** declarando sus atributos como de lectura exclusiva (`private final`).
+Estructura de las clases POJO (`Plain Old Java Objects`) utilizadas para el transporte horizontal de información entre módulos. El diseño prioriza restricciones de inmutabilidad en las propiedades de los datos mapeados.
 
 ```mermaid
 classDiagram
@@ -209,6 +209,6 @@ classDiagram
     Recommendation "1" *--> "1" Flight : incluye vuelta
 ```
 
-### Argumentos clave para la defensa ante el tribunal:
-* **Thread-Safety implícito:** Al carecer de métodos modificadores de estado (`setters`), estos objetos son inherentemente seguros frente a accesos concurrentes de hilos paralelos. Esto es crítico dado que el servidor HTTP (`Javalin`) atiende peticiones de clientes simultáneamente mientras el consumidor ActiveMQ procesa flujos de entrada.
-* **Alineación Conceptual:** La recomendación no almacena referencias de memoria vivas a los objetos para evitar acoplamientos rígidos en el almacenamiento persistente; en su lugar, mapea claves descriptivas e identificadores formando una estructura óptima para su rápido renderizado en la interfaz web.
+### Especificaciones de Modelo:
+* **Estructura Segura (Thread-Safety):** Al prescindir de métodos modificadores (`setters`), los objetos de datos son intrínsecamente estables ante llamadas concurrentes asíncronas generadas por los hilos concurrentes del servidor web o los consumidores de la cola.
+* **Estructura Desacoplada:** El modelo evita enlaces directos por puntero entre instancias de memoria vivas dentro del Datamart; las entidades se vinculan mediante indexación de identificadores descriptivos.
