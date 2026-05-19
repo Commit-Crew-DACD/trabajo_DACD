@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +31,7 @@ public class EventStoreWriter {
             String ts = obj.get("ts").getAsString();
             String date = DATE_FORMATTER.format(Instant.parse(ts));
 
-            Path dir = Paths.get(basePath, topic, ss);
+            Path dir = ProjectPaths.resolve(basePath, topic, ss);
             Files.createDirectories(dir);
 
             Path file = dir.resolve(date + ".events");

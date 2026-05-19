@@ -7,7 +7,7 @@ import org.ulpgc.dacd.model.RecommendationConfig;
 
 import java.util.List;
 
-public class DatamartRepository {
+public class DatamartRepository implements RecommendationDataStore {
     private final EventRepository eventRepository;
     private final FlightRepository flightRepository;
     private final RecommendationRepository recommendationRepository;
@@ -53,8 +53,9 @@ public class DatamartRepository {
         recommendationRepository.clear();
     }
 
-    public void saveRecommendation(Recommendation recommendation) {
-        recommendationRepository.save(recommendation);
+    @Override
+    public void replaceRecommendations(List<Recommendation> recommendations) {
+        recommendationRepository.replaceAll(recommendations);
     }
 
     public List<Recommendation> findAllRecommendations() {

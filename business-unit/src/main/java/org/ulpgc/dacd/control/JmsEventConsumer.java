@@ -62,18 +62,15 @@ public class JmsEventConsumer {
 
     private void processMessage(String topicName, String json) {
         if (parser.isEventMessage(json)) {
-            int before = repository.countEvents();
             repository.saveEvent(parser.parseEvent(json));
-            int after = repository.countEvents();
-            if (after > before) {
-                recommendationService.rebuildRecommendations();
-                System.out.println("Real-time event processed from " + topicName + ". Events: " + after);
-            }
+            recommendationService.rebuildRecommendations();
+            System.out.println("Real-time event processed from " + topicName + ". Events: " + repository.countEvents());
             return;
         }
 
         if (parser.isFlightMessage(json)) {
             repository.saveFlight(parser.parseFlight(json));
+            recommendationService.rebuildRecommendations();
             System.out.println("Real-time flight processed from " + topicName + ". Flights: " + repository.countFlights());
             return;
         }

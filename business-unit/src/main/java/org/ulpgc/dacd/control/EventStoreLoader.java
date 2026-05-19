@@ -13,7 +13,7 @@ public class EventStoreLoader {
     private final DatamartRepository repository;
 
     public EventStoreLoader(String eventStorePath, EventMessageParser parser, DatamartRepository repository) {
-        this.eventStorePath = Path.of(eventStorePath);
+        this.eventStorePath = ProjectPaths.resolve(eventStorePath);
         this.parser = parser;
         this.repository = repository;
     }
@@ -26,6 +26,7 @@ public class EventStoreLoader {
 
         try (Stream<Path> files = Files.walk(eventStorePath)) {
             files.filter(path -> path.toString().endsWith(".events"))
+                    .sorted()
                     .forEach(this::loadFile);
         } catch (IOException e) {
             throw new RuntimeException("Error reading eventstore", e);

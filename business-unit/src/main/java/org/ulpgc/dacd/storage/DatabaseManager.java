@@ -1,12 +1,16 @@
 package org.ulpgc.dacd.storage;
 
+import org.ulpgc.dacd.control.ProjectPaths;
+
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:sqlite:business-unit.db";
+    private static final Path DATABASE_PATH = ProjectPaths.resolve("business-unit.db");
+    private static final String URL = "jdbc:sqlite:" + DATABASE_PATH;
 
     public DatabaseManager() {
         initDatabase();

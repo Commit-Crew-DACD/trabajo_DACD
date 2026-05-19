@@ -13,48 +13,6 @@ public class RecommendationRepository {
         this.databaseManager = databaseManager;
     }
 
-    public void save(Recommendation recommendation) {
-        String sql = """
-                INSERT INTO flight_event_recommendations (
-                    event_id, event_name, event_city, event_date,
-                    event_start_time, event_end_time,
-                    outbound_flight_number, outbound_airline,
-                    outbound_origin, outbound_destination,
-                    outbound_departure_time, outbound_arrival_time,
-                    return_flight_number, return_airline,
-                    return_origin, return_destination,
-                    return_departure_time, captured_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-                """;
-
-        try (Connection connection = databaseManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setString(1, recommendation.getEventId());
-            statement.setString(2, recommendation.getEventName());
-            statement.setString(3, recommendation.getEventCity());
-            statement.setString(4, recommendation.getEventDate());
-            statement.setString(5, recommendation.getEventStartTime());
-            statement.setString(6, recommendation.getEventEndTime());
-            statement.setString(7, recommendation.getOutboundFlightNumber());
-            statement.setString(8, recommendation.getOutboundAirline());
-            statement.setString(9, recommendation.getOutboundOrigin());
-            statement.setString(10, recommendation.getOutboundDestination());
-            statement.setString(11, recommendation.getOutboundDepartureTime());
-            statement.setString(12, recommendation.getOutboundArrivalTime());
-            statement.setString(13, recommendation.getReturnFlightNumber());
-            statement.setString(14, recommendation.getReturnAirline());
-            statement.setString(15, recommendation.getReturnOrigin());
-            statement.setString(16, recommendation.getReturnDestination());
-            statement.setString(17, recommendation.getReturnDepartureTime());
-            statement.setString(18, recommendation.getCapturedAt());
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error saving recommendation", e);
-        }
-    }
-
     public List<Recommendation> findAll() {
         String sql = """
                 SELECT event_id, event_name, event_city, event_date,
@@ -119,6 +77,41 @@ public class RecommendationRepository {
         }
     }
 
+    public void replaceAll(List<Recommendation> recommendations) {
+        String deleteSql = "DELETE FROM flight_event_recommendations;";
+        String insertSql = """
+                INSERT INTO flight_event_recommendations (
+                    event_id, event_name, event_city, event_date,
+                    event_start_time, event_end_time,
+                    outbound_flight_number, outbound_airline,
+                    outbound_origin, outbound_destination,
+                    outbound_departure_time, outbound_arrival_time,
+                    return_flight_number, return_airline,
+                    return_origin, return_destination,
+                    return_departure_time, captured_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                """;
+
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement deleteStatement = connection.prepareStatement(deleteSql);
+             PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
+
+            connection.setAutoCommit(false);
+            deleteStatement.executeUpdate();
+
+            for (Recommendation recommendation : recommendations) {
+                fillInsertStatement(insertStatement, recommendation);
+                insertStatement.addBatch();
+            }
+
+            insertStatement.executeBatch();
+            connection.commit();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error replacing recommendations", e);
+        }
+    }
+
     public int count() {
         String sql = "SELECT COUNT(*) AS total FROM flight_event_recommendations;";
 
@@ -131,5 +124,26 @@ public class RecommendationRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error counting recommendations", e);
         }
+    }
+
+    private void fillInsertStatement(PreparedStatement statement, Recommendation recommendation) throws SQLException {
+        statement.setString(1, recommendation.getEventId());
+        statement.setString(2, recommendation.getEventName());
+        statement.setString(3, recommendation.getEventCity());
+        statement.setString(4, recommendation.getEventDate());
+        statement.setString(5, recommendation.getEventStartTime());
+        statement.setString(6, recommendation.getEventEndTime());
+        statement.setString(7, recommendation.getOutboundFlightNumber());
+        statement.setString(8, recommendation.getOutboundAirline());
+        statement.setString(9, recommendation.getOutboundOrigin());
+        statement.setString(10, recommendation.getOutboundDestination());
+        statement.setString(11, recommendation.getOutboundDepartureTime());
+        statement.setString(12, recommendation.getOutboundArrivalTime());
+        statement.setString(13, recommendation.getReturnFlightNumber());
+        statement.setString(14, recommendation.getReturnAirline());
+        statement.setString(15, recommendation.getReturnOrigin());
+        statement.setString(16, recommendation.getReturnDestination());
+        statement.setString(17, recommendation.getReturnDepartureTime());
+        statement.setString(18, recommendation.getCapturedAt());
     }
 }
