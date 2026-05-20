@@ -4,8 +4,8 @@ Proyecto final de la asignatura **Desarrollo de Aplicaciones para Ciencia de Dat
 
 ## Integrantes
 
-- Integrante 1: `<Nombre completo>`
-- Integrante 2: `<Nombre completo>`
+- Integrante 1: `<Marcos Pérez Pérez>`
+- Integrante 2: `<César Luis Saavedra Vaca>`
 
 ## 1. Descripcion
 
