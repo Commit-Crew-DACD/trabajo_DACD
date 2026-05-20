@@ -15,9 +15,11 @@ Este proyecto implementa una arquitectura distribuida para capturar, almacenar, 
 - un vuelo de ida desde `LPA` hacia la ciudad del evento
 - un vuelo de vuelta desde la ciudad del evento hacia `LPA`
 
-La propuesta de valor consiste en automatizar una tarea que normalmente se realiza de forma manual: comprobar si existe una combinacion viable entre la fecha de un concierto, la llegada al destino antes del evento y la vuelta despues de su finalizacion. La unidad de negocio transforma datos dispersos en recomendaciones consultables desde una API REST y una interfaz web.
-
 El sistema combina procesamiento en tiempo real mediante JMS con reconstruccion historica desde un Event Store local, por lo que puede regenerar el datamart y las recomendaciones a partir de datos ya capturados.
+
+### Propuesta de Valor
+
+La propuesta de valor consiste en **automatizar una tarea de planificación que normalmente requiere gran esfuerzo manual**: comprobar si existe una combinación viable entre la fecha y hora de un concierto, un vuelo que llegue al destino con margen suficiente antes del evento, y un vuelo de regreso tras su finalización. La unidad de negocio transforma datos dispersos y asíncronos en recomendaciones consolidadas, listas para ser consumidas fácilmente a través de una API REST y una interfaz web. Store local, por lo que puede regenerar el datamart y las recomendaciones a partir de datos ya capturados.
 
 ## 2. Modulos
 
@@ -30,22 +32,11 @@ El proyecto esta organizado como un proyecto Maven multi-modulo.
 | `EventStoreBuilder` | Consume los topics JMS y persiste cada mensaje recibido en ficheros `.events`. |
 | `business-unit` | Carga el Event Store, mantiene el datamart SQLite, calcula recomendaciones y expone API REST e interfaz web. |
 
-## 3. Arquitectura
+## 3. Arquitectura y Diseño Técnico
 
-```mermaid
-flowchart LR
-    FP["flight-provider"] -->|"Topic Flight"| MQ["ActiveMQ"]
-    TP["ticketmaster-provider"] -->|"Topic Ticketmaster"| MQ
-    MQ --> ESB["EventStoreBuilder"]
-    MQ --> BU["business-unit"]
-    ESB --> ES["eventstore/**/*.events"]
-    ES --> BU
-    BU --> DB["business-unit.db"]
-    BU --> API["Javalin API :7070"]
-    API --> UI["Frontend public/index.html"]
-```
+El sistema adopta un enfoque orientado a eventos (EDA) acoplado a través de un broker de mensajería asíncrona, un Datamart relacional centralizado y un servidor web integrado para la exposición de servicios.
 
-### Flujo de Datos
+### 3.1. Flujo de Datos General
 
 ```mermaid
 sequenceDiagram
@@ -68,46 +59,111 @@ sequenceDiagram
     UI->>BU: Consulta endpoints /api/*
 ```
 
-### Diagrama de Clases Simplificado
+### 3.2. Arquitectura de Control y Componentes (`business-unit`)
+
+La lógica de control del componente principal orquesta de forma simultánea la API REST, la lectura histórica de archivos y el receptor de eventos JMS, interactuando de forma unificada sobre la fachada del repositorio.
 
 ```mermaid
 classDiagram
-    class FlightController
-    class FlightService
-    class FlightProvider
-    class JmsPublisher
-    class TicketmasterService
-    class EventProvider
-    class EventStoreWriter
-    class JmsSubscriber
-    class EventStoreLoader
-    class EventMessageParser
-    class RecommendationService
-    class RestApi
-    class DatamartRepository
-    class RecommendationDataStore
-    class EventRepository
-    class FlightRepository
-    class RecommendationRepository
-    class ConfigRepository
+    class Main {
+        +main(String[] args)$ void
+    }
 
-    FlightProvider <|.. FlightService
-    FlightController --> FlightProvider
-    FlightController --> JmsPublisher
-    EventProvider <|.. TicketmasterService
-    JmsSubscriber --> EventStoreWriter
-    EventStoreLoader --> EventMessageParser
-    RecommendationService --> RecommendationDataStore
-    RecommendationDataStore <|.. DatamartRepository
-    RestApi --> DatamartRepository
-    RestApi --> RecommendationService
-    DatamartRepository --> EventRepository
-    DatamartRepository --> FlightRepository
-    DatamartRepository --> RecommendationRepository
-    DatamartRepository --> ConfigRepository
+    class JmsEventConsumer {
+        -String brokerUrl
+        -String[] topics
+        -Connection connection
+        -Session session
+        +start() void
+        -processMessage(String topicName, String json) void
+    }
+
+    class RestApi {
+        -int port
+        +start() void
+    }
+
+    class EventStoreLoader {
+        -Path eventStorePath
+        +load() void
+        -loadFile(Path file) void
+        -loadLine(String json) void
+    }
+
+    class EventMessageParser {
+        +isEventMessage(String json) boolean
+        +isFlightMessage(String json) boolean
+        +parseEvent(String json) Event
+        +parseFlight(String json) Flight
+    }
+
+    class RecommendationService {
+        +rebuildRecommendations() void
+        -arrivesBeforeEventWithMargin() boolean
+        -departsAfterEventWithMargin() boolean
+    }
+
+    class DatamartRepository {
+        +saveEvent(Event event) void
+        +saveFlight(Flight flight) void
+        +saveRecommendation(Recommendation r) void
+    }
+
+    Main --> DatamartRepository : inicializa
+    Main --> EventMessageParser : inicializa
+    Main --> EventStoreLoader : orquesta
+    Main --> RecommendationService : orquesta
+    Main --> JmsEventConsumer : arranca
+    Main --> RestApi : expone
+```
+
+### 3.3. Capa de Persistencia (Patrón Repository y Facade)
+
+El diseño del almacenamiento local sobre SQLite se organiza mediante la segregación de interfaces por tabla (Patrón Repository) y se consolida bajo un único punto de acceso unificado (Patrón Facade), ocultando la implementación interna de JDBC de las capas superiores.
+
+```mermaid
+classDiagram
+    class DatabaseManager {
+        -String URL
+        +getConnection() Connection
+        -initDatabase() void
+    }
+
+    class DatamartRepository {
+        -EventRepository eventRepository
+        -FlightRepository flightRepository
+        -RecommendationRepository recommendationRepository
+        -ConfigRepository configRepository
+    }
+
+    class EventRepository {
+        +save(Event event) void
+        +findAll() List~Event~
+    }
+
+    class FlightRepository {
+        +save(Flight flight) void
+        +findAll() List~Flight~
+    }
+
+    class RecommendationRepository {
+        +save(Recommendation r) void
+        +findAll() List~Recommendation~
+    }
+
+    DatamartRepository *--> DatabaseManager : comparte conexión
+    DatamartRepository *--> EventRepository : delega eventos
+    DatamartRepository *--> FlightRepository : delega vuelos
+    DatamartRepository *--> RecommendationRepository : delega recomendaciones
 ```
 
 ## 4. Fuentes de Datos
+
+### Justificación de la elección de APIs
+
+Para nutrir el sistema, se han seleccionado dos fuentes de datos oficiales y fiables que evitan la fragilidad de técnicas como el *web scraping*:
+- **Ticketmaster (Discovery API):** Elegida por ser el estándar de la industria en la venta de entradas. Su API REST ofrece un volumen masivo de eventos reales, con filtrado granular por ciudad, clasificación (música) y paginación, además de proporcionar metadatos estandarizados (fechas, horas, recintos).
+- **AENA (Infovuelos):** Se seleccionó por ser la fuente oficial de la red de aeropuertos de España. Garantiza la obtención de vuelos reales y programados sin las limitaciones, bloqueos o baneos habituales que imponen las APIs de aerolíneas individuales o los agregadores comerciales tipo Skyscanner.
 
 ### AENA
 
@@ -165,21 +221,48 @@ Cada fichero representa los mensajes de un topic, sistema origen y fecha de capt
 
 ### Datamart SQLite
 
-`business-unit` genera el archivo:
+`business-unit` genera el archivo `business-unit.db`. SQLite se utiliza por su portabilidad, simplicidad de despliegue y adecuacion para una demo academica local.
 
-```text
-business-unit.db
+#### Estructura del Datamart
+
+El esquema relacional centraliza la información mediante tablas independientes que se enlazan de forma lógica a través de la tabla de recomendaciones:
+
+```mermaid
+erDiagram
+    RECOMMENDATION {
+        string eventId PK
+        string eventName
+        string eventCity
+        string outboundFlightNumber FK
+        string returnFlightNumber FK
+        string capturedAt
+    }
+    EVENT {
+        string id PK
+        string name
+        string city
+        string venue
+        string date
+        string startTime
+    }
+    FLIGHT {
+        string flightNumber PK
+        string origin
+        string destination
+        string date
+        string scheduledTime
+    }
+    CONFIG {
+        string originAirport PK
+        int outboundMarginHours
+        int returnMarginHours
+        int defaultEventDurationHours
+    }
+
+    RECOMMENDATION }o--|| EVENT : "basado en"
+    RECOMMENDATION }o--|| FLIGHT : "vuelo ida"
+    RECOMMENDATION }o--|| FLIGHT : "vuelo vuelta"
 ```
-
-Este datamart contiene:
-
-- eventos
-- vuelos
-- recomendaciones
-- configuracion del algoritmo
-
-SQLite se utiliza por su portabilidad, simplicidad de despliegue y adecuacion para una demo academica local.
-
 ## 6. Motor de Recomendaciones
 
 `RecommendationService` calcula recomendaciones a partir de eventos y vuelos cargados desde el Event Store o recibidos en tiempo real.
@@ -210,14 +293,14 @@ Configuracion inicial del algoritmo:
 
 ## 7. Principios y Patrones Aplicados
 
-- **Arquitectura dirigida por eventos (EDA)**: los proveedores publican mensajes en ActiveMQ y no dependen de la unidad de negocio.
-- **Repository**: `EventRepository`, `FlightRepository`, `RecommendationRepository` y `ConfigRepository` encapsulan el acceso SQL.
-- **Facade**: `DatamartRepository` centraliza el acceso al datamart.
-- **Dependency Inversion Principle (DIP)**: `RecommendationService` depende de `RecommendationDataStore`, no de una implementacion concreta.
-- **Separacion de responsabilidades**: API, persistencia, parsing, carga historica, captura de datos y recomendacion estan separados.
-- **Modelo inmutable en business-unit**: las entidades principales usan campos `private final` y no exponen setters.
-- **Regeneracion transaccional**: las recomendaciones se sustituyen como conjunto para evitar estados intermedios inconsistentes.
-- **Frontend separado**: `RestApi` sirve `business-unit/src/main/resources/public/index.html`, manteniendo la interfaz fuera del codigo Java.
+El desarrollo se ha guiado por principios de código limpio y patrones de diseño estructurales y de comportamiento:
+
+* **Arquitectura Dirigida por Eventos (EDA):** Los proveedores (`flight-provider` y `ticketmaster-provider`) publican en ActiveMQ y están totalmente desacoplados de la unidad de negocio.
+* **Patrón Repository:** `EventRepository`, `FlightRepository`, `RecommendationRepository` y `ConfigRepository` encapsulan el acceso SQL.
+* **Patrón Facade:** `DatamartRepository` centraliza el acceso al datamart, proporcionando una interfaz limpia a la API y al motor de recomendaciones.
+* **Dependency Inversion Principle (DIP):** `RecommendationService` depende de la abstracción `RecommendationDataStore`, no de una implementación concreta de base de datos.
+* **Inmutabilidad y Thread-Safety:** El modelo de dominio (`Event`, `Flight`, `Recommendation`) utiliza campos `private final` y carece de *setters*. Esto garantiza estabilidad ante llamadas concurrentes generadas por la API o el consumidor JMS.
+* **Separación de Responsabilidades (SRP):** Procesamiento de JSON (`EventMessageParser`), persistencia, lógica de negocio y exposición web están estrictamente divididos en clases con una única razón para cambiar.
 
 ## 8. Requisitos Previos
 
