@@ -301,7 +301,7 @@ El desarrollo se ha guiado por principios de código limpio y patrones de diseñ
 * **Dependency Inversion Principle (DIP):** `RecommendationService` depende de la abstracción `RecommendationDataStore`, no de una implementación concreta de base de datos.
 * **Inmutabilidad y Thread-Safety:** El modelo de dominio (`Event`, `Flight`, `Recommendation`) utiliza campos `private final` y carece de *setters*. Esto garantiza estabilidad ante llamadas concurrentes generadas por la API o el consumidor JMS.
 * **Separación de Responsabilidades (SRP):** Procesamiento de JSON (`EventMessageParser`), persistencia, lógica de negocio y exposición web están estrictamente divididos en clases con una única razón para cambiar.
-* * **Arquitectura Kappa:** El sistema unifica el procesamiento histórico y en tiempo real bajo un único motor lógico (`business-unit`). No existen capas separadas para *batch* y *streaming* (como en Lambda); la reconstrucción del Datamart se realiza "reproduciendo" los eventos inmutables del Event Store mediante la misma lógica que procesa los mensajes entrantes de ActiveMQ.
+* **Arquitectura Kappa:** El sistema unifica el procesamiento histórico y en tiempo real bajo un único motor lógico (`business-unit`). No existen capas separadas para *batch* y *streaming* (como en Lambda); la reconstrucción del Datamart se realiza "reproduciendo" los eventos inmutables del Event Store mediante la misma lógica que procesa los mensajes entrantes de ActiveMQ.
 
 ## 8. Requisitos Previos
 
