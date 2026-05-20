@@ -562,36 +562,3 @@ Para una prueba desde cero:
 3. Borrar `business-unit.db`.
 4. Borrar `eventstore/` si se quiere descartar todo el historico.
 5. Arrancar de nuevo en el orden indicado.
-
-## 14. Limpieza del Repositorio Para la Entrega
-
-Se recomienda commitear:
-
-- codigo fuente de los cuatro modulos
-- `pom.xml` padre y `pom.xml` de cada modulo
-- `README.md`
-- `business-unit/src/main/resources/public/index.html`
-
-Se recomienda no commitear:
-
-- `target/`
-- `.idea/`
-- `*.db`
-- `eventstore/`, salvo que se quiera entregar expresamente una muestra de datos
-- archivos generados por ejecuciones locales no controladas
-
-## 15. Demostracion Recomendada
-
-Para la defensa:
-
-1. Mostrar ActiveMQ arrancado.
-2. Ejecutar `EventStoreBuilder`.
-3. Ejecutar `business-unit` y abrir `http://localhost:7070`.
-4. Ejecutar `flight-provider` con `LPA MAD BCN`.
-5. Ejecutar `ticketmaster-provider` con `Madrid 6` y `Barcelona 6`.
-6. Mostrar contadores de eventos, vuelos y recomendaciones.
-7. Abrir una recomendacion y explicar la tupla evento + ida + vuelta.
-8. Mostrar los ficheros `.events` generados.
-9. Consultar `/api/config` o modificar la configuracion desde la interfaz.
-
-Esta demostracion cubre la propuesta de valor, la arquitectura dirigida por eventos, la reconstruccion historica, el datamart y la exposicion final al usuario.
