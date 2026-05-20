@@ -4,13 +4,15 @@ import org.ulpgc.dacd.control.EventMessageParser;
 import org.ulpgc.dacd.control.EventStoreLoader;
 import org.ulpgc.dacd.control.RecommendationService;
 import org.ulpgc.dacd.model.RecommendationConfig;
+import org.ulpgc.dacd.storage.DatabaseManager;
 import org.ulpgc.dacd.storage.DatamartRepository;
 import org.ulpgc.dacd.control.RestApi;
 import org.ulpgc.dacd.control.JmsEventConsumer;
 
 public class Main {
     public static void main(String[] args) {
-        DatamartRepository repository = new DatamartRepository();
+        DatabaseManager databaseManager = new DatabaseManager();
+        DatamartRepository repository = new DatamartRepository(databaseManager);
         RecommendationConfig config = repository.getConfig();
 
         EventMessageParser parser = new EventMessageParser();

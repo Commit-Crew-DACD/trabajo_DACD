@@ -7,18 +7,20 @@ import org.ulpgc.dacd.model.Flight;
 
 public class EventMessageParser {
 
+    private JsonObject parse(String json) {
+        return JsonParser.parseString(json).getAsJsonObject();
+    }
+
     public boolean isEventMessage(String json) {
-        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
-        return object.has("ss") && "ticketmaster-provider".equals(object.get("ss").getAsString());
+        return "ticketmaster-provider".equals(getString(parse(json), "ss"));
     }
 
     public boolean isFlightMessage(String json) {
-        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
-        return object.has("ss") && "flight-provider".equals(object.get("ss").getAsString());
+        return "flight-provider".equals(getString(parse(json), "ss"));
     }
 
     public Event parseEvent(String json) {
-        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
+        JsonObject object = parse(json);
 
         return new Event(
                 getString(object, "id"),
@@ -33,7 +35,7 @@ public class EventMessageParser {
     }
 
     public Flight parseFlight(String json) {
-        JsonObject object = JsonParser.parseString(json).getAsJsonObject();
+        JsonObject object = parse(json);
 
         return new Flight(
                 getString(object, "flightNumber"),

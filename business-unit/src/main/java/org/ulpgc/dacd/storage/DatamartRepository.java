@@ -13,8 +13,8 @@ public class DatamartRepository {
     private final RecommendationRepository recommendationRepository;
     private final ConfigRepository configRepository;
 
-    public DatamartRepository() {
-        DatabaseManager databaseManager = new DatabaseManager();
+    // Inyección de dependencias: recibimos el DatabaseManager desde fuera
+    public DatamartRepository(DatabaseManager databaseManager) {
         this.eventRepository = new EventRepository(databaseManager);
         this.flightRepository = new FlightRepository(databaseManager);
         this.recommendationRepository = new RecommendationRepository(databaseManager);
