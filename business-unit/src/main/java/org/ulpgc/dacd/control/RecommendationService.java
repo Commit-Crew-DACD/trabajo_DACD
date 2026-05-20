@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -21,11 +22,13 @@ import java.util.Locale;
 import java.util.Map;
 
 public class RecommendationService {
+    private static final String ARRIVAL_FLIGHT_TYPE = "L";
     private static final DateTimeFormatter EVENT_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final DateTimeFormatter FLIGHT_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_TIME;
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final int MAX_RECOMMENDATIONS_PER_EVENT = 10;
+    private static final int MAX_REAL_FLIGHT_LOOKAHEAD_DAYS = 14;
     private static final int MAX_OUTBOUND_MARGIN_HOURS = 36;
     private static final int MAX_RETURN_MARGIN_HOURS = 72;
     private static final int DEFAULT_LOCAL_CLOCK_DURATION_MINUTES = 180;
@@ -153,9 +156,37 @@ public class RecommendationService {
 
             LocalDate.parse(flight.getDate(), FLIGHT_DATE_FORMATTER);
             LocalTime.parse(flightTime(flight), TIME_FORMATTER);
-            return true;
+            return isRealCapturedFlight(flight);
         } catch (DateTimeParseException e) {
             System.out.println("Skipping flight with invalid date/time: " + flight.getFlightNumber());
+            return false;
+        }
+    }
+
+    private boolean isRealCapturedFlight(Flight flight) {
+        try {
+            if (flight.getCapturedAt() == null || flight.getCapturedAt().isBlank()) {
+                System.out.println("Skipping flight without capture timestamp: " + flight.getFlightNumber());
+                return false;
+            }
+
+            LocalDate flightDate = LocalDate.parse(flight.getDate(), FLIGHT_DATE_FORMATTER);
+            LocalDate captureDate = Instant.parse(flight.getCapturedAt()).atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate lastRealFlightDate = captureDate.plusDays(MAX_REAL_FLIGHT_LOOKAHEAD_DAYS);
+
+            boolean insideRealCaptureWindow = !flightDate.isBefore(captureDate)
+                    && !flightDate.isAfter(lastRealFlightDate);
+
+            if (!insideRealCaptureWindow) {
+                System.out.println("Skipping flight outside real capture window: "
+                        + flight.getFlightNumber()
+                        + " on " + flight.getDate()
+                        + " captured at " + flight.getCapturedAt());
+            }
+
+            return insideRealCaptureWindow;
+        } catch (DateTimeParseException e) {
+            System.out.println("Skipping flight with invalid capture timestamp: " + flight.getFlightNumber());
             return false;
         }
     }
@@ -210,7 +241,7 @@ public class RecommendationService {
 
     private boolean departsAfterEventWithMargin(Flight flight, LocalDateTime eventEnd,
                                                 RecommendationConfig config) {
-        LocalDateTime departure = parseFlightDepartureDateTime(flight);
+        LocalDateTime departure = estimateDepartureDateTime(flight);
         LocalDateTime earliestAllowedDeparture = eventEnd.plusHours(config.getReturnMarginHours());
         LocalDateTime latestAllowedDeparture = eventEnd.plusHours(MAX_RETURN_MARGIN_HOURS);
 
@@ -227,18 +258,28 @@ public class RecommendationService {
 
     private Comparator<Flight> outboundFlightComparator() {
         return Comparator.comparing(this::estimateArrivalDateTime).reversed()
-                .thenComparing(this::parseFlightDepartureDateTime)
+                .thenComparing(this::estimateDepartureDateTime)
                 .thenComparing(Flight::getFlightNumber, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
                 .thenComparing(Flight::getAirline, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
     }
 
     private Comparator<Flight> returnFlightComparator() {
-        return Comparator.comparing(this::parseFlightDepartureDateTime)
+        return Comparator.comparing(this::estimateDepartureDateTime)
                 .thenComparing(Flight::getFlightNumber, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
                 .thenComparing(Flight::getAirline, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
     }
 
-    private LocalDateTime parseFlightDepartureDateTime(Flight flight) {
+    private LocalDateTime estimateDepartureDateTime(Flight flight) {
+        LocalDateTime scheduledDateTime = parseFlightDateTime(flight);
+
+        if (ARRIVAL_FLIGHT_TYPE.equalsIgnoreCase(flight.getFlightType())) {
+            return scheduledDateTime.minusMinutes(estimateLocalArrivalOffsetMinutes(flight));
+        }
+
+        return scheduledDateTime;
+    }
+
+    private LocalDateTime parseFlightDateTime(Flight flight) {
         LocalDate date = LocalDate.parse(flight.getDate(), FLIGHT_DATE_FORMATTER);
         return LocalDateTime.of(date, LocalTime.parse(flightTime(flight), TIME_FORMATTER));
     }
@@ -254,7 +295,11 @@ public class RecommendationService {
     }
 
     private LocalDateTime estimateArrivalDateTime(Flight flight) {
-        return parseFlightDepartureDateTime(flight).plusMinutes(estimateLocalArrivalOffsetMinutes(flight));
+        if (ARRIVAL_FLIGHT_TYPE.equalsIgnoreCase(flight.getFlightType())) {
+            return parseFlightDateTime(flight);
+        }
+
+        return estimateDepartureDateTime(flight).plusMinutes(estimateLocalArrivalOffsetMinutes(flight));
     }
 
     private long estimateLocalArrivalOffsetMinutes(Flight flight) {
@@ -313,9 +358,9 @@ public class RecommendationService {
 
     private Recommendation toRecommendation(Event event, LocalDateTime eventEnd,
                                             Flight outboundFlight, Flight returnFlight, String capturedAt) {
-        LocalDateTime outboundDeparture = parseFlightDepartureDateTime(outboundFlight);
+        LocalDateTime outboundDeparture = estimateDepartureDateTime(outboundFlight);
         LocalDateTime outboundArrival = estimateArrivalDateTime(outboundFlight);
-        LocalDateTime returnDeparture = parseFlightDepartureDateTime(returnFlight);
+        LocalDateTime returnDeparture = estimateDepartureDateTime(returnFlight);
 
         return new Recommendation(
                 event.getId(),
