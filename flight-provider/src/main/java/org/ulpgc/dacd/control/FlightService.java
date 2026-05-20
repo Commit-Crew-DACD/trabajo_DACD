@@ -26,48 +26,54 @@ public class FlightService implements FlightProvider {
     @Override
     public List<Flight> getFlights() throws IOException {
         List<Flight> flights = new ArrayList<>();
-        String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos"
-                + "&airport=" + origin
-                + "&flightType=S"
-                + "&limit=500"
-                + "&dosDias=si";
+        String[] flightTypes = {"S", "L"};
 
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .build();
+        for (String type : flightTypes) {
+            String url = "https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos"
+                    + "&airport=" + origin
+                    + "&flightType=" + type
+                    + "&limit=500"
+                    + "&dosDias=si";
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) {
-                return flights;
-            }
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .build();
 
-            JsonArray array = JsonParser.parseString(response.body().string()).getAsJsonArray();
-
-            for (int i = 0; i < array.size(); i++) {
-                JsonObject f = array.get(i).getAsJsonObject();
-                String destination = getString(f, "iataOtro");
-
-                if (!destinations.contains(destination)) {
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful() || response.body() == null) {
                     continue;
                 }
 
-                flights.add(new Flight(
-                        getString(f, "numVuelo"),
-                        getString(f, "iataAena"),
-                        destination,
-                        getString(f, "ciudadIataOtro"),
-                        getString(f, "fecha"),
-                        getString(f, "horaProgramada"),
-                        getString(f, "horaEstimada"),
-                        getString(f, "estado"),
-                        getString(f, "nombreCompania"),
-                        getString(f, "terminal"),
-                        "S"
-                ));
+                JsonArray array = JsonParser.parseString(response.body().string()).getAsJsonArray();
+
+                for (int i = 0; i < array.size(); i++) {
+                    JsonObject f = array.get(i).getAsJsonObject();
+                    String iataOtro = getString(f, "iataOtro");
+
+                    if (!destinations.contains(iataOtro)) {
+                        continue;
+                    }
+
+                    String flightOrigin = type.equals("S") ? getString(f, "iataAena") : iataOtro;
+                    String flightDestination = type.equals("S") ? iataOtro : getString(f, "iataAena");
+
+                    flights.add(new Flight(
+                            getString(f, "numVuelo"),
+                            flightOrigin,
+                            flightDestination,
+                            getString(f, "ciudadIataOtro"),
+                            getString(f, "fecha"),
+                            getString(f, "horaProgramada"),
+                            getString(f, "horaEstimada"),
+                            getString(f, "estado"),
+                            getString(f, "nombreCompania"),
+                            getString(f, "terminal"),
+                            type
+                    ));
+                }
             }
         }
-
         return flights;
     }
 

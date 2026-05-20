@@ -57,7 +57,7 @@ public class RecommendationService {
                     .toList();
 
             List<Flight> returnFlights = flights.stream()
-                    .filter(flight -> isOutboundFlight(flight, event, config))
+                    .filter(flight -> isReturnFlight(flight, event, config))
                     .filter(flight -> departsAfterEventWithMargin(flight, eventEnd, config))
                     .sorted(Comparator.comparing(this::parseFlightDepartureDateTime))
                     .toList();
@@ -105,12 +105,32 @@ public class RecommendationService {
         );
     }
 
+    private boolean isReturnFlight(Flight flight, Event event, RecommendationConfig config) {
+        boolean isRealReturn = config.getOriginAirport().equalsIgnoreCase(flight.getDestination())
+                && (matchesEventCity(flight.getOrigin(), event.getCity())
+                || matchesEventCity(flight.getDestinationCity(), event.getCity()));
+
+        boolean isSimulatedReturn = config.getOriginAirport().equalsIgnoreCase(flight.getOrigin())
+                && (matchesEventCity(flight.getDestination(), event.getCity())
+                || matchesEventCity(flight.getDestinationCity(), event.getCity()));
+
+        return isRealReturn || isSimulatedReturn;
+    }
+
     private boolean arrivesBeforeEventWithMargin(Flight flight, LocalDateTime eventStart, RecommendationConfig config) {
-        return true;
+        LocalTime arrivalTime = estimateArrivalDateTime(flight).toLocalTime();
+        LocalDateTime projectedArrival = LocalDateTime.of(eventStart.toLocalDate(), arrivalTime);
+        if (projectedArrival.isAfter(eventStart.minusHours(2))) {
+            projectedArrival = projectedArrival.minusDays(1);
+        }
+
+        return projectedArrival.isBefore(eventStart.minusHours(2));
     }
 
     private boolean departsAfterEventWithMargin(Flight flight, LocalDateTime eventEnd, RecommendationConfig config) {
-        return true;
+        LocalTime departureTime = parseFlightDepartureDateTime(flight).toLocalTime();
+        LocalDateTime projectedDeparture = LocalDateTime.of(eventEnd.toLocalDate().plusDays(1), departureTime);
+        return projectedDeparture.isAfter(eventEnd.plusHours(2));
     }
 
     private boolean matchesEventCity(String flightValue, String eventCity) {
