@@ -32,16 +32,18 @@ public class RecommendationService {
         List<Flight> flights = repository.findAllFlights();
 
         System.out.println("Rebuilding recommendations...");
-        System.out.println("Events: " + events.size());
-        System.out.println("Flights: " + flights.size());
-
         repository.clearRecommendations();
 
-        for (Event event : events) {
-            System.out.println("Processing event: " + event.getName() + " - " + event.getDate());
+        java.util.Set<String> processedEvents = new java.util.HashSet<>();
 
+        for (Event event : events) {
             if (!isValidEvent(event)) {
-                System.out.println("Skipping event without valid start time.");
+                continue;
+            }
+
+            String eventDayKey = event.getName() + "-" + event.getDate();
+
+            if (processedEvents.contains(eventDayKey)) {
                 continue;
             }
 
@@ -85,7 +87,11 @@ public class RecommendationService {
                 }
             }
 
-            System.out.println("Recommendations saved for event: " + saved);
+            if (saved > 0) {
+                processedEvents.add(eventDayKey);
+            }
+
+            System.out.println("Recommendations saved for event '" + event.getName() + "': " + saved);
         }
     }
 
@@ -200,6 +206,12 @@ public class RecommendationService {
             returnDeparture = returnDeparture.plusDays(1);
         }
 
+        String realReturnOrigin = returnFlight.getOrigin().equalsIgnoreCase(outboundFlight.getOrigin())
+                ? returnFlight.getDestination()
+                : returnFlight.getOrigin();
+
+        String realReturnDestination = outboundFlight.getOrigin();
+
         return new Recommendation(
                 event.getId(),
                 event.getName(),
@@ -215,8 +227,8 @@ public class RecommendationService {
                 outboundArrival.format(DISPLAY_DATE_TIME_FORMATTER),
                 returnFlight.getFlightNumber() + "R",
                 returnFlight.getAirline(),
-                returnFlight.getDestination(),
-                returnFlight.getOrigin(),
+                realReturnOrigin,
+                realReturnDestination,
                 returnDeparture.format(DISPLAY_DATE_TIME_FORMATTER),
                 Instant.now().toString()
         );
