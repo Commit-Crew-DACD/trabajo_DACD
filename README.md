@@ -56,33 +56,6 @@ El sistema adopta un enfoque orientado a eventos (EDA) acoplado a través de un 
 
 Los módulos pueden correr en la misma máquina o en equipos distintos. El único requisito es que todos apunten al mismo broker ActiveMQ y que `business-unit` tenga acceso al directorio `eventstore/` generado por `EventStoreBuilder`.
 
-```
-┌──────────────────────────────────────────────────────┐
-│                     Mismo equipo o red local          │
-│                                                       │
-│  ┌─────────────────┐     ┌──────────────────────┐    │
-│  │ flight-provider  │     │ ticketmaster-provider │    │
-│  │  (cada hora)    │     │   (cada 6 horas)     │    │
-│  └────────┬────────┘     └──────────┬───────────┘    │
-│           │  publica topics JMS     │                 │
-│           ▼                         ▼                 │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │          Apache ActiveMQ  tcp://localhost:61616  │  │
-│  └───────────────────┬─────────────────────────────┘  │
-│                      │ consume topics                  │
-│           ┌──────────┴──────────┐                     │
-│           ▼                     ▼                     │
-│  ┌─────────────────┐  ┌──────────────────────────┐   │
-│  │ EventStoreBuilder│  │      business-unit        │   │
-│  │  escribe .events │  │  SQLite + API REST + Web  │   │
-│  └────────┬────────┘  └──────────────────────────┘   │
-│           │ lee histórico al arrancar                  │
-│           └──────────────────────────────────────────► │
-│                                                       │
-│            http://localhost:7070  ◄── Usuario         │
-└──────────────────────────────────────────────────────┘
-```
-
 ### 3.2. Flujo de Datos General
 
 ```mermaid
